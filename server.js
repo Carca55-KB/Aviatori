@@ -164,6 +164,34 @@ app.post('/api/sensors', async (req, res) => {
     }
 });
 
+app.get('/api/test-data', async (req, res) => {
+    try {
+        const testInserts = [
+            { touch: false, proximity: 50 },
+            { touch: false, proximity: 45 },
+            { touch: false, proximity: 30 },
+            { touch: true, proximity: 5 },
+            { touch: false, proximity: 20 },
+            { touch: false, proximity: 35 },
+            { touch: true, proximity: 2 },
+            { touch: false, proximity: 60 },
+            { touch: false, proximity: 55 },
+            { touch: true, proximity: 8 }
+        ];
+        
+        for (const data of testInserts) {
+            await pool.query(
+                'INSERT INTO sensor_data (touch, proximity) VALUES ($1, $2)',
+                [data.touch, data.proximity]
+            );
+        }
+        
+        res.json({ message: 'Dati di test inseriti!', count: testInserts.length });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 server.listen(PORT, () => {
     console.log(`Server avviato sulla porta ${PORT}`);
 });
