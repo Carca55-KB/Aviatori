@@ -6,7 +6,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(__dirname));
 
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
@@ -18,7 +18,7 @@ pool.connect()
     .catch(err => console.error('Database connection error:', err));
 
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 app.get('/api/aviators', async (req, res) => {
