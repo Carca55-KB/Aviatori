@@ -463,7 +463,7 @@
         });
         
         dislikeBtn.addEventListener('click', () => {
-            socket.emit('add-like');
+            socket.emit('add-ten-likes');
             dislikeBtn.style.background = '#e74c3c';
             dislikeBtn.style.color = 'white';
             setTimeout(() => {
@@ -472,10 +472,17 @@
             }, 300);
         });
         
+        socket.on('zoom-change', (receivedZoomLevel) => {
+            if (!isAdmin && viewerVideo) {
+                viewerVideo.style.transform = `scale(${receivedZoomLevel})`;
+            }
+        });
+        
         function updateZoom() {
             video.style.transform = `scale(${zoomLevel})`;
             zoomInfo.textContent = `Zoom: ${zoomLevel.toFixed(1)}x`;
             videoWrapper.style.cursor = zoomLevel > 1 ? 'zoom-out' : 'zoom-in';
+            socket.emit('zoom-change', zoomLevel);
         }
         
         async function getCameras() {
@@ -653,10 +660,32 @@
             updateZoom();
         });
         
-        cameraSelect.addEventListener('change', () => {
-            if (stream) {
-                stopWebcam();
-                startWebcam();
+        cameraSelect.addEventListener('change', async () => {
+            if (!stream) return;
+            
+            try {
+                const deviceId = cameraSelect.value;
+                const newConstraints = {
+                    video: { deviceId: { exact: deviceId } },
+                    audio: true
+                };
+                
+                stream.getVideoTracks().forEach(track => track.stop());
+                
+                const newStream = await navigator.mediaDevices.getUserMedia(newConstraints);
+                const newVideoTrack = newStream.getVideoTracks()[0];
+                const currentAudioTrack = stream.getAudioTracks()[0];
+                
+                stream.removeTrack(stream.getVideoTracks()[0]);
+                stream.addTrack(newVideoTrack);
+                
+                video.srcObject = stream;
+                
+                newStream.getVideoTracks().forEach(track => track.stop());
+                
+                status.textContent = 'Camera cambiata durante la trasmissione';
+            } catch (err) {
+                status.textContent = 'Errore cambio camera: ' + err.message;
             }
         });
         

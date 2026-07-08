@@ -82,6 +82,19 @@ io.on('connection', (socket) => {
         io.emit('likes-update', totalLikes);
     });
     
+    socket.on('add-ten-likes', () => {
+        totalLikes += 10;
+        io.emit('likes-update', totalLikes);
+    });
+    
+    socket.on('zoom-change', (zoomLevel) => {
+        if (socket.isAdmin) {
+            viewerSockets.forEach(viewer => {
+                viewer.emit('zoom-change', zoomLevel);
+            });
+        }
+    });
+    
     socket.on('disconnect', () => {
         if (socket.isAdmin) {
             adminSocket = null;
