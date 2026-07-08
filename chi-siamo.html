@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi siamo - Il Piccolo Principe</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #e8d5b7;
+            padding-top: 70px;
+        }
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(10px);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+        }
+        nav .logo {
+            color: #f4d03f;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        nav .nav-links {
+            display: flex;
+            gap: 25px;
+        }
+        nav .nav-links a {
+            color: #e8d5b7;
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: color 0.3s;
+            padding: 8px 16px;
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+        nav .nav-links a:hover {
+            color: #f4d03f;
+            background: rgba(244, 208, 63, 0.1);
+        }
+        nav .nav-links a.active {
+            color: #f4d03f;
+            background: rgba(244, 208, 63, 0.15);
+        }
+        header {
+            text-align: center;
+            padding: 60px 20px;
+            background: rgba(0,0,0,0.2);
+        }
+        header h1 {
+            font-size: 3rem;
+            color: #f4d03f;
+            margin-bottom: 10px;
+        }
+        header .subtitle {
+            color: #bb8fce;
+            font-style: italic;
+            font-size: 1.2rem;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 50px 20px;
+        }
+        .team-section {
+            margin-bottom: 50px;
+        }
+        .team-section h2 {
+            color: #f4d03f;
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+        .member-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            border: 2px solid rgba(244, 208, 63, 0.3);
+            transition: all 0.3s;
+        }
+        .member-card:hover {
+            border-color: #f4d03f;
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(244, 208, 63, 0.2);
+        }
+        .member-avatar {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #f4d03f 0%, #e74c3c 100%);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: white;
+        }
+        .member-card h3 {
+            color: #f4d03f;
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+        }
+        .member-card .role {
+            color: #bb8fce;
+            font-style: italic;
+            margin-bottom: 15px;
+        }
+        .member-card p {
+            color: #e8d5b7;
+            line-height: 1.6;
+        }
+        .project-section {
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 40px;
+            margin-top: 50px;
+        }
+        .project-section h2 {
+            color: #f4d03f;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .project-section p {
+            color: #e8d5b7;
+            line-height: 1.8;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        .tech-badge {
+            background: rgba(244, 208, 63, 0.2);
+            border: 1px solid #f4d03f;
+            color: #f4d03f;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(0,0,0,0.3);
+            margin-top: 60px;
+        }
+        footer p {
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo">Il Piccolo Principe</div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="pilots.html">I sensi della volpe</a>
+            <a href="webcam.html">Webcam</a>
+            <a href="chi-siamo.html" class="active">Chi siamo</a>
+            <a href="login.html">Login</a>
+        </div>
+    </nav>
+    
+    <header>
+        <h1>Chi siamo</h1>
+        <p class="subtitle">Il team dietro il progetto</p>
+    </header>
+
+    <div class="container">
+        <div class="team-section">
+            <h2>Il nostro Team</h2>
+            <div class="team-grid">
+                <div class="member-card">
+                    <div class="member-avatar">👨‍💻</div>
+                    <h3>Membro 1</h3>
+                    <p class="role">Sviluppatore</p>
+                    <p>Descrizione del ruolo e competenze del membro del team.</p>
+                </div>
+                
+                <div class="member-card">
+                    <div class="member-avatar">👩‍💻</div>
+                    <h3>Membro 2</h3>
+                    <p class="role">Designer</p>
+                    <p>Descrizione del ruolo e competenze del membro del team.</p>
+                </div>
+                
+                <div class="member-card">
+                    <div class="member-avatar">🔧</div>
+                    <h3>Membro 3</h3>
+                    <p class="role">Hardware Engineer</p>
+                    <p>Descrizione del ruolo e competenze del membro del team.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="project-section">
+            <h2>Il Progetto</h2>
+            <p>Questo progetto nasce dall'esigenza di monitorare e visualizzare in tempo reale i dati provenienti da sensori collegati a un robot.</p>
+            <p>Il sistema permette di visualizzare i dati dei sensori di tocco e prossimità attraverso un'interfaccia web moderna e intuitiva.</p>
+            <p>La webcam integrata consente inoltre la trasmissione video in tempo reale con funzionalità di zoom e interazione con gli utenti.</p>
+            
+            <div class="tech-stack">
+                <span class="tech-badge">Node.js</span>
+                <span class="tech-badge">Express</span>
+                <span class="tech-badge">PostgreSQL</span>
+                <span class="tech-badge">Socket.io</span>
+                <span class="tech-badge">Web Audio API</span>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2026 Il Piccolo Principe - Tutti i diritti riservati</p>
+    </footer>
+</body>
+</html>
