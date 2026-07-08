@@ -265,6 +265,34 @@
             margin-left: 10px;
             color: #2ecc71;
         }
+        .qr-section {
+            margin-top: 50px;
+            text-align: center;
+            padding: 30px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            border: 2px solid rgba(244, 208, 63, 0.3);
+            width: 100%;
+            max-width: 400px;
+        }
+        .qr-section h3 {
+            color: #f4d03f;
+            margin-bottom: 20px;
+        }
+        .qr-section .qr-code {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            display: inline-block;
+        }
+        .qr-section .qr-code img {
+            display: block;
+        }
+        .qr-section .url-text {
+            margin-top: 15px;
+            color: #bb8fce;
+            font-size: 0.9rem;
+        }
     </style>
 </head>
 <body>
@@ -274,7 +302,6 @@
             <a href="index.html">Home</a>
             <a href="pilots.html">I sensi della volpe</a>
             <a href="webcam.html" class="active">Webcam</a>
-            <a href="qrcode.html">QR Code</a>
             <span id="auth-nav"></span>
         </div>
     </nav>
@@ -329,6 +356,14 @@
                 </button>
             </div>
             <div class="likes-display" id="likes-display"></div>
+        </div>
+        
+        <div class="qr-section">
+            <h3>Condividi questa pagina</h3>
+            <div class="qr-code">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://aviatori.onrender.com/webcam.html" alt="QR Code" width="200" height="200">
+            </div>
+            <p class="url-text">https://aviatori.onrender.com/webcam.html</p>
         </div>
     </div>
 
