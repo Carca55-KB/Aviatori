@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Il Piccolo Principe</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #e8d5b7;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 70px;
+        }
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(10px);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+        }
+        nav .logo {
+            color: #f4d03f;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        nav .nav-links {
+            display: flex;
+            gap: 25px;
+        }
+        nav .nav-links a {
+            color: #e8d5b7;
+            text-decoration: none;
+            font-size: 0.95rem;
+            padding: 8px 16px;
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+        nav .nav-links a:hover {
+            color: #f4d03f;
+            background: rgba(244, 208, 63, 0.1);
+        }
+        nav .nav-links a.active {
+            color: #f4d03f;
+            background: rgba(244, 208, 63, 0.15);
+        }
+        .login-container {
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 40px;
+            border: 2px solid rgba(244, 208, 63, 0.3);
+            width: 100%;
+            max-width: 400px;
+            margin-top: 50px;
+        }
+        h1 {
+            color: #f4d03f;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #bb8fce;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            font-size: 1rem;
+            font-family: 'Georgia', serif;
+            background: rgba(255,255,255,0.1);
+            border: 2px solid rgba(244, 208, 63, 0.5);
+            border-radius: 10px;
+            color: #e8d5b7;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .form-group input:focus {
+            border-color: #f4d03f;
+        }
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            font-size: 1.1rem;
+            font-family: 'Georgia', serif;
+            background: rgba(244, 208, 63, 0.2);
+            border: 2px solid #f4d03f;
+            color: #f4d03f;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .login-btn:hover {
+            background: #f4d03f;
+            color: #1a1a2e;
+        }
+        .error {
+            background: rgba(231, 76, 60, 0.2);
+            border: 1px solid #e74c3c;
+            color: #e74c3c;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            display: none;
+        }
+        .info {
+            text-align: center;
+            margin-top: 20px;
+            color: #888;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo">Il Piccolo Principe</div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="pilots.html">I sensi della volpe</a>
+            <a href="webcam.html">Webcam</a>
+            <a href="qrcode.html">QR Code</a>
+        </div>
+    </nav>
+    
+    <div class="login-container">
+        <h1>Area Admin</h1>
+        <div class="error" id="error-msg"></div>
+        <form id="login-form">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required autocomplete="username">
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required autocomplete="current-password">
+            </div>
+            <button type="submit" class="login-btn">Accedi</button>
+        </form>
+        <p class="info">Solo gli amministratori possono trasmettere la webcam.</p>
+    </div>
+
+    <script>
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorMsg = document.getElementById('error-msg');
+            
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    window.location.href = 'webcam.html';
+                } else {
+                    errorMsg.textContent = data.message;
+                    errorMsg.style.display = 'block';
+                }
+            } catch (err) {
+                errorMsg.textContent = 'Errore di connessione';
+                errorMsg.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

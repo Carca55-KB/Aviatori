@@ -39,6 +39,7 @@
         nav .nav-links {
             display: flex;
             gap: 25px;
+            align-items: center;
         }
         nav .nav-links a {
             color: #e8d5b7;
@@ -57,6 +58,14 @@
             color: #f4d03f;
             background: rgba(244, 208, 63, 0.15);
         }
+        .admin-badge {
+            background: #e74c3c;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
         header {
             text-align: center;
             padding: 40px 20px;
@@ -66,6 +75,10 @@
             font-size: 2.5rem;
             color: #f4d03f;
             margin-bottom: 10px;
+        }
+        header .subtitle {
+            color: #bb8fce;
+            font-style: italic;
         }
         .container {
             max-width: 900px;
@@ -90,7 +103,7 @@
             position: relative;
             cursor: zoom-in;
         }
-        #webcam {
+        #webcam, #viewer-video {
             width: 100%;
             border-radius: 10px;
             background: #000;
@@ -178,6 +191,23 @@
         .device-select select option {
             background: #1a1a2e;
         }
+        .viewer-info {
+            background: rgba(187, 143, 206, 0.2);
+            border: 1px solid #bb8fce;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .waiting-msg {
+            text-align: center;
+            padding: 50px;
+            color: #888;
+        }
+        .waiting-msg h2 {
+            color: #f4d03f;
+            margin-bottom: 15px;
+        }
     </style>
 </head>
 <body>
@@ -188,35 +218,60 @@
             <a href="pilots.html">I sensi della volpe</a>
             <a href="webcam.html" class="active">Webcam</a>
             <a href="qrcode.html">QR Code</a>
+            <span id="auth-nav"></span>
         </div>
     </nav>
     
     <header>
-        <h1>Webcam Live</h1>
+        <h1 id="page-title">Webcam Live</h1>
+        <p class="subtitle" id="page-subtitle"></p>
     </header>
 
     <div class="container">
-        <div class="video-container">
-            <div class="video-wrapper" id="video-wrapper">
-                <video id="webcam" autoplay playsinline></video>
-                <div class="zoom-info" id="zoom-info">Zoom: 1x</div>
+        <div id="admin-panel" style="display: none;">
+            <div class="viewer-info">
+                <strong>Modalità Admin</strong> - Stai trasmettendo la tua webcam a tutti gli utenti connessi
             </div>
+            <div class="video-container">
+                <div class="video-wrapper" id="video-wrapper">
+                    <video id="webcam" autoplay playsinline muted></video>
+                    <div class="zoom-info" id="zoom-info">Zoom: 1x</div>
+                </div>
+            </div>
+            
+            <div class="device-select" id="device-select-container" style="display: none;">
+                <label for="camera-select">Seleziona camera:</label>
+                <select id="camera-select"></select>
+            </div>
+            
+            <div class="controls">
+                <button class="btn" id="start-btn">Avvia Trasmissione</button>
+                <button class="btn stop" id="stop-btn" style="display: none;">Ferma Trasmissione</button>
+            </div>
+            
+            <div class="status" id="status">Clicca "Avvia Trasmissione" per iniziare</div>
         </div>
         
-        <div class="device-select" id="device-select-container" style="display: none;">
-            <label for="camera-select">Seleziona camera:</label>
-            <select id="camera-select"></select>
+        <div id="viewer-panel" style="display: none;">
+            <div class="video-container">
+                <div class="video-wrapper">
+                    <img id="viewer-video" alt="Stream Admin" style="width: 100%; background: #000; border-radius: 10px;">
+                </div>
+            </div>
+            <div class="status" id="viewer-status">In attesa della trasmissione dell'admin...</div>
         </div>
-        
-        <div class="controls">
-            <button class="btn" id="start-btn">Avvia Webcam</button>
-            <button class="btn stop" id="stop-btn" style="display: none;">Ferma Webcam</button>
-        </div>
-        
-        <div class="status" id="status">Clicca "Avvia Webcam" per iniziare</div>
     </div>
 
+    <script src="/socket.io/socket.io.js"></script>
     <script>
+        const socket = io();
+        let isAdmin = false;
+        let stream = null;
+        let zoomLevel = 1;
+        let minZoom = 1;
+        let maxZoom = 5;
+        let isTransmitting = false;
+        
         const video = document.getElementById('webcam');
         const videoWrapper = document.getElementById('video-wrapper');
         const startBtn = document.getElementById('start-btn');
@@ -225,19 +280,54 @@
         const cameraSelect = document.getElementById('camera-select');
         const deviceSelectContainer = document.getElementById('device-select-container');
         const zoomInfo = document.getElementById('zoom-info');
+        const viewerVideo = document.getElementById('viewer-video');
+        const viewerStatus = document.getElementById('viewer-status');
+        const adminPanel = document.getElementById('admin-panel');
+        const viewerPanel = document.getElementById('viewer-panel');
+        const pageTitle = document.getElementById('page-title');
+        const pageSubtitle = document.getElementById('page-subtitle');
+        const authNav = document.getElementById('auth-nav');
         
-        let stream = null;
-        let zoomLevel = 1;
-        let minZoom = 1;
-        let maxZoom = 5;
+        async function checkAuth() {
+            try {
+                const response = await fetch('/api/auth-status');
+                const data = await response.json();
+                isAdmin = data.isAdmin;
+                
+                if (isAdmin) {
+                    adminPanel.style.display = 'block';
+                    viewerPanel.style.display = 'none';
+                    pageTitle.textContent = 'Webcam Admin';
+                    pageSubtitle.textContent = 'Trasmetti la tua webcam agli utenti';
+                    authNav.innerHTML = '<a href="#" id="logout-btn" class="admin-badge">Esci</a>';
+                    document.getElementById('logout-btn').addEventListener('click', logout);
+                    socket.emit('admin-join');
+                } else {
+                    adminPanel.style.display = 'none';
+                    viewerPanel.style.display = 'block';
+                    pageTitle.textContent = 'Webcam Viewer';
+                    pageSubtitle.textContent('Guarda la trasmissione dell\'admin');
+                    authNav.innerHTML = '<a href="login.html">Login Admin</a>';
+                    socket.emit('viewer-join');
+                }
+            } catch (err) {
+                console.error('Errore auth:', err);
+            }
+        }
         
-        navigator.mediaDevices.ondevicechange = async () => {
-            await getCameras();
-        };
+        socket.on('webcam-frame', (data) => {
+            if (!isAdmin) {
+                viewerVideo.src = data;
+                viewerStatus.textContent = 'Ricevendo trasmissione dall\'admin';
+                viewerStatus.className = 'status success';
+            }
+        });
         
-        setInterval(async () => {
-            await getCameras();
-        }, 3000);
+        function updateZoom() {
+            video.style.transform = `scale(${zoomLevel})`;
+            zoomInfo.textContent = `Zoom: ${zoomLevel.toFixed(1)}x`;
+            videoWrapper.style.cursor = zoomLevel > 1 ? 'zoom-out' : 'zoom-in';
+        }
         
         async function getCameras() {
             try {
@@ -264,26 +354,48 @@
             try {
                 const deviceId = cameraSelect.value || null;
                 const constraints = {
-                    video: deviceId ? { deviceId: { exact: deviceId } } : true
+                    video: deviceId ? { deviceId: { exact: deviceId } } : { width: 1280, height: 720 }
                 };
                 
                 stream = await navigator.mediaDevices.getUserMedia(constraints);
                 video.srcObject = stream;
                 
-                status.textContent = 'Webcam attiva - Scroll per zoom';
+                status.textContent = 'Trasmissione attiva - Utenti connessi la stanno visualizzando';
                 status.className = 'status success';
                 startBtn.style.display = 'none';
                 stopBtn.style.display = 'inline-block';
+                isTransmitting = true;
                 
                 zoomLevel = 1;
                 updateZoom();
                 
                 await getCameras();
+                startFrameCapture();
                 
             } catch (err) {
                 status.textContent = 'Errore: ' + err.message;
                 status.className = 'status error';
             }
+        }
+        
+        function startFrameCapture() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            function captureFrame() {
+                if (!isTransmitting || !stream) return;
+                
+                canvas.width = video.videoWidth || 640;
+                canvas.height = video.videoHeight || 480;
+                ctx.drawImage(video, 0, 0);
+                
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                socket.emit('webcam-frame', dataUrl);
+                
+                requestAnimationFrame(captureFrame);
+            }
+            
+            captureFrame();
         }
         
         function stopWebcam() {
@@ -295,39 +407,35 @@
             
             zoomLevel = 1;
             updateZoom();
+            isTransmitting = false;
             
-            status.textContent = 'Webcam fermata';
+            status.textContent = 'Trasmissione fermata';
             status.className = 'status';
             startBtn.style.display = 'inline-block';
             stopBtn.style.display = 'none';
         }
         
-        function updateZoom() {
-            video.style.transform = `scale(${zoomLevel})`;
-            zoomInfo.textContent = `Zoom: ${zoomLevel.toFixed(1)}x`;
-            videoWrapper.style.cursor = zoomLevel > 1 ? 'zoom-out' : 'zoom-in';
+        async function logout(e) {
+            e.preventDefault();
+            await fetch('/api/logout', { method: 'POST' });
+            window.location.reload();
         }
         
         videoWrapper.addEventListener('wheel', (e) => {
             if (!stream) return;
-            
             e.preventDefault();
-            
             const delta = e.deltaY > 0 ? -0.2 : 0.2;
             zoomLevel = Math.min(maxZoom, Math.max(minZoom, zoomLevel + delta));
-            
             updateZoom();
         });
         
-        videoWrapper.addEventListener('click', (e) => {
+        videoWrapper.addEventListener('click', () => {
             if (!stream) return;
-            
             if (zoomLevel >= maxZoom) {
                 zoomLevel = 1;
             } else {
                 zoomLevel = Math.min(maxZoom, zoomLevel + 0.5);
             }
-            
             updateZoom();
         });
         
@@ -341,7 +449,7 @@
         startBtn.addEventListener('click', startWebcam);
         stopBtn.addEventListener('click', stopWebcam);
         
-        getCameras();
+        checkAuth();
     </script>
 </body>
 </html>
