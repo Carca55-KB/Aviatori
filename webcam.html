@@ -264,7 +264,10 @@
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        const socket = io();
+        const socket = io({
+            transports: ['polling', 'websocket'],
+            upgrade: true
+        });
         let isAdmin = false;
         let stream = null;
         let zoomLevel = 1;
@@ -306,7 +309,7 @@
                     adminPanel.style.display = 'none';
                     viewerPanel.style.display = 'block';
                     pageTitle.textContent = 'Webcam Viewer';
-                    pageSubtitle.textContent('Guarda la trasmissione dell\'admin');
+                    pageSubtitle.textContent = 'Guarda la trasmissione dell\'admin';
                     authNav.innerHTML = '<a href="login.html">Login Admin</a>';
                     socket.emit('viewer-join');
                 }
@@ -318,8 +321,20 @@
         socket.on('webcam-frame', (data) => {
             if (!isAdmin) {
                 viewerVideo.src = data;
-                viewerStatus.textContent = 'Ricevendo trasmissione dall\'admin';
+                viewerStatus.textContent = 'Ricezione trasmissione dall\'admin...';
                 viewerStatus.className = 'status success';
+                console.log('Frame ricevuto');
+            }
+        });
+        
+        socket.on('connect', () => {
+            console.log('Socket connesso:', socket.id);
+        });
+        
+        socket.on('disconnect', () => {
+            console.log('Socket disconnesso');
+            if (!isAdmin) {
+                viewerStatus.textContent = 'Disconnesso. Riconnessione...';
             }
         });
         
@@ -381,21 +396,28 @@
         function startFrameCapture() {
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
+            let lastFrameTime = 0;
+            const frameInterval = 100; // 10 fps
             
-            function captureFrame() {
+            function captureFrame(timestamp) {
                 if (!isTransmitting || !stream) return;
                 
-                canvas.width = video.videoWidth || 640;
-                canvas.height = video.videoHeight || 480;
-                ctx.drawImage(video, 0, 0);
-                
-                const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
-                socket.emit('webcam-frame', dataUrl);
+                if (timestamp - lastFrameTime >= frameInterval) {
+                    lastFrameTime = timestamp;
+                    
+                    canvas.width = video.videoWidth || 640;
+                    canvas.height = video.videoHeight || 480;
+                    ctx.drawImage(video, 0, 0);
+                    
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.5);
+                    socket.emit('webcam-frame', dataUrl);
+                    console.log('Frame inviato');
+                }
                 
                 requestAnimationFrame(captureFrame);
             }
             
-            captureFrame();
+            requestAnimationFrame(captureFrame);
         }
         
         function stopWebcam() {
