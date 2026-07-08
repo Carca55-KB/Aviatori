@@ -83,10 +83,30 @@
             padding: 20px;
             border: 2px solid rgba(244, 208, 63, 0.3);
         }
+        .video-wrapper {
+            width: 100%;
+            overflow: hidden;
+            border-radius: 10px;
+            position: relative;
+            cursor: zoom-in;
+        }
         #webcam {
             width: 100%;
             border-radius: 10px;
             background: #000;
+            transform-origin: center center;
+            transition: transform 0.1s ease;
+        }
+        .zoom-info {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            color: #f4d03f;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            pointer-events: none;
         }
         .controls {
             display: flex;
@@ -176,7 +196,10 @@
 
     <div class="container">
         <div class="video-container">
-            <video id="webcam" autoplay playsinline></video>
+            <div class="video-wrapper" id="video-wrapper">
+                <video id="webcam" autoplay playsinline></video>
+                <div class="zoom-info" id="zoom-info">Zoom: 1x</div>
+            </div>
         </div>
         
         <div class="device-select" id="device-select-container" style="display: none;">
@@ -194,13 +217,26 @@
 
     <script>
         const video = document.getElementById('webcam');
+        const videoWrapper = document.getElementById('video-wrapper');
         const startBtn = document.getElementById('start-btn');
         const stopBtn = document.getElementById('stop-btn');
         const status = document.getElementById('status');
         const cameraSelect = document.getElementById('camera-select');
         const deviceSelectContainer = document.getElementById('device-select-container');
+        const zoomInfo = document.getElementById('zoom-info');
         
         let stream = null;
+        let zoomLevel = 1;
+        let minZoom = 1;
+        let maxZoom = 5;
+        
+        navigator.mediaDevices.ondevicechange = async () => {
+            await getCameras();
+        };
+        
+        setInterval(async () => {
+            await getCameras();
+        }, 3000);
         
         async function getCameras() {
             try {
@@ -209,9 +245,14 @@
                 
                 if (cameras.length > 0) {
                     deviceSelectContainer.style.display = 'block';
+                    const currentValue = cameraSelect.value;
                     cameraSelect.innerHTML = cameras.map((camera, index) => 
                         `<option value="${camera.deviceId}">${camera.label || 'Camera ' + (index + 1)}</option>`
                     ).join('');
+                    
+                    if (currentValue && cameras.find(c => c.deviceId === currentValue)) {
+                        cameraSelect.value = currentValue;
+                    }
                 }
             } catch (err) {
                 console.error('Errore enumerateDevices:', err);
@@ -228,10 +269,13 @@
                 stream = await navigator.mediaDevices.getUserMedia(constraints);
                 video.srcObject = stream;
                 
-                status.textContent = 'Webcam attiva';
+                status.textContent = 'Webcam attiva - Scroll per zoom';
                 status.className = 'status success';
                 startBtn.style.display = 'none';
                 stopBtn.style.display = 'inline-block';
+                
+                zoomLevel = 1;
+                updateZoom();
                 
                 await getCameras();
                 
@@ -248,11 +292,43 @@
                 stream = null;
             }
             
+            zoomLevel = 1;
+            updateZoom();
+            
             status.textContent = 'Webcam fermata';
             status.className = 'status';
             startBtn.style.display = 'inline-block';
             stopBtn.style.display = 'none';
         }
+        
+        function updateZoom() {
+            video.style.transform = `scale(${zoomLevel})`;
+            zoomInfo.textContent = `Zoom: ${zoomLevel.toFixed(1)}x`;
+            videoWrapper.style.cursor = zoomLevel > 1 ? 'zoom-out' : 'zoom-in';
+        }
+        
+        videoWrapper.addEventListener('wheel', (e) => {
+            if (!stream) return;
+            
+            e.preventDefault();
+            
+            const delta = e.deltaY > 0 ? -0.2 : 0.2;
+            zoomLevel = Math.min(maxZoom, Math.max(minZoom, zoomLevel + delta));
+            
+            updateZoom();
+        });
+        
+        videoWrapper.addEventListener('click', (e) => {
+            if (!stream) return;
+            
+            if (zoomLevel >= maxZoom) {
+                zoomLevel = 1;
+            } else {
+                zoomLevel = Math.min(maxZoom, zoomLevel + 0.5);
+            }
+            
+            updateZoom();
+        });
         
         cameraSelect.addEventListener('change', () => {
             if (stream) {
