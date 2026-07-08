@@ -339,6 +339,12 @@
                         </tr>
                     `).join('');
                 } else {
+                    touchValue.textContent = '--';
+                    touchValue.className = 'sensor-value';
+                    touchStatus.textContent = 'Nessun dato';
+                    proximityValue.textContent = '--';
+                    proximityValue.className = 'sensor-value';
+                    lastUpdate.textContent = '--';
                     historyBody.innerHTML = '<tr><td colspan="3">Nessun dato disponibile</td></tr>';
                 }
             } catch (err) {
