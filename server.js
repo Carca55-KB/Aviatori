@@ -42,9 +42,12 @@ pool.connect()
 
 let adminSocket = null;
 let viewerSockets = new Set();
+let totalLikes = 0;
 
 io.on('connection', (socket) => {
     console.log('Client connesso:', socket.id);
+    
+    socket.emit('likes-update', totalLikes);
     
     socket.on('admin-join', () => {
         adminSocket = socket;
@@ -64,6 +67,19 @@ io.on('connection', (socket) => {
                 viewer.emit('webcam-frame', data);
             });
         }
+    });
+    
+    socket.on('audio-frame', (data) => {
+        if (socket.isAdmin) {
+            viewerSockets.forEach(viewer => {
+                viewer.emit('audio-frame', data);
+            });
+        }
+    });
+    
+    socket.on('add-like', () => {
+        totalLikes++;
+        io.emit('likes-update', totalLikes);
     });
     
     socket.on('disconnect', () => {

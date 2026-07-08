@@ -208,6 +208,60 @@
             color: #f4d03f;
             margin-bottom: 15px;
         }
+        .like-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .like-btn, .dislike-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 25px;
+            font-size: 1.1rem;
+            font-family: 'Georgia', serif;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid;
+        }
+        .like-btn {
+            background: rgba(46, 204, 113, 0.2);
+            border-color: #2ecc71;
+            color: #2ecc71;
+        }
+        .like-btn:hover {
+            background: #2ecc71;
+            color: white;
+            transform: scale(1.05);
+        }
+        .like-btn.liked {
+            background: #2ecc71;
+            color: white;
+        }
+        .dislike-btn {
+            background: rgba(231, 76, 60, 0.2);
+            border-color: #e74c3c;
+            color: #e74c3c;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        .like-count {
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        .likes-display {
+            text-align: center;
+            margin-top: 10px;
+            color: #2ecc71;
+            font-size: 1rem;
+        }
+        .audio-indicator {
+            display: inline-block;
+            margin-left: 10px;
+            color: #2ecc71;
+        }
     </style>
 </head>
 <body>
@@ -259,6 +313,19 @@
                 </div>
             </div>
             <div class="status" id="viewer-status">In attesa della trasmissione dell'admin...</div>
+            
+            <div class="like-buttons">
+                <button class="like-btn" id="like-btn">
+                    <span>👍</span>
+                    <span>Like</span>
+                    <span class="like-count" id="like-count">0</span>
+                </button>
+                <button class="dislike-btn" id="dislike-btn" title="I dislike non vengono conteggiati">
+                    <span>👎</span>
+                    <span>Dislike</span>
+                </button>
+            </div>
+            <div class="likes-display" id="likes-display"></div>
         </div>
     </div>
 
@@ -290,6 +357,15 @@
         const pageTitle = document.getElementById('page-title');
         const pageSubtitle = document.getElementById('page-subtitle');
         const authNav = document.getElementById('auth-nav');
+        const likeBtn = document.getElementById('like-btn');
+        const dislikeBtn = document.getElementById('dislike-btn');
+        const likeCount = document.getElementById('like-count');
+        const likesDisplay = document.getElementById('likes-display');
+        
+        let audioContext = null;
+        let audioWorkletNode = null;
+        let mediaStreamAudioSourceNode = null;
+        let audioElement = null;
         
         async function checkAuth() {
             try {
@@ -324,6 +400,21 @@
                 viewerStatus.textContent = 'Ricezione trasmissione dall\'admin...';
                 viewerStatus.className = 'status success';
                 console.log('Frame ricevuto');
+                
+                if (!audioElement) {
+                    audioElement = new Audio();
+                    audioElement.autoplay = true;
+                }
+            }
+        });
+        
+        socket.on('audio-frame', (data) => {
+            if (!isAdmin && data) {
+                if (!audioElement) {
+                    audioElement = new Audio();
+                    audioElement.autoplay = true;
+                }
+                audioElement.src = data;
             }
         });
         
@@ -336,6 +427,23 @@
             if (!isAdmin) {
                 viewerStatus.textContent = 'Disconnesso. Riconnessione...';
             }
+        });
+        
+        socket.on('likes-update', (count) => {
+            likeCount.textContent = count;
+            if (count > 0) {
+                likesDisplay.textContent = `${count} like totali sulla trasmissione`;
+            }
+        });
+        
+        likeBtn.addEventListener('click', () => {
+            socket.emit('add-like');
+            likeBtn.classList.add('liked');
+            setTimeout(() => likeBtn.classList.remove('liked'), 300);
+        });
+        
+        dislikeBtn.addEventListener('click', () => {
+            alert('I dislike non vengono conteggiati 😊');
         });
         
         function updateZoom() {
@@ -369,7 +477,8 @@
             try {
                 const deviceId = cameraSelect.value || null;
                 const constraints = {
-                    video: deviceId ? { deviceId: { exact: deviceId } } : { width: 1280, height: 720 }
+                    video: deviceId ? { deviceId: { exact: deviceId } } : { width: 1280, height: 720 },
+                    audio: true
                 };
                 
                 stream = await navigator.mediaDevices.getUserMedia(constraints);
@@ -386,6 +495,7 @@
                 
                 await getCameras();
                 startFrameCapture();
+                startAudioCapture();
                 
             } catch (err) {
                 status.textContent = 'Errore: ' + err.message;
@@ -420,11 +530,42 @@
             requestAnimationFrame(captureFrame);
         }
         
+        function startAudioCapture() {
+            if (!stream) return;
+            
+            const audioTracks = stream.getAudioTracks();
+            if (audioTracks.length === 0) {
+                console.log('Nessun audio track disponibile');
+                return;
+            }
+            
+            const audioStream = new MediaStream(audioTracks);
+            const mediaRecorder = new MediaRecorder(audioStream, { mimeType: 'audio/webm' });
+            
+            mediaRecorder.ondataavailable = (event) => {
+                if (event.data.size > 0) {
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                        socket.emit('audio-frame', reader.result);
+                    };
+                    reader.readAsDataURL(event.data);
+                }
+            };
+            
+            mediaRecorder.start(100);
+            console.log('Audio capture avviato');
+        }
+        
         function stopWebcam() {
             if (stream) {
                 stream.getTracks().forEach(track => track.stop());
                 video.srcObject = null;
                 stream = null;
+            }
+            
+            if (audioElement) {
+                audioElement.pause();
+                audioElement.src = '';
             }
             
             zoomLevel = 1;
