@@ -110,22 +110,34 @@
             text-align: center;
         }
         .team-list {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 20px;
+            max-width: 900px;
+            margin: 0 auto;
         }
         .member-name {
             background: rgba(255,255,255,0.1);
             border-radius: 15px;
-            padding: 15px 25px;
+            padding: 20px;
             font-size: 1.1rem;
             border: 1px solid rgba(244, 208, 63, 0.3);
             transition: all 0.3s;
+            text-align: center;
         }
         .member-name:hover {
             border-color: #f4d03f;
             background: rgba(244, 208, 63, 0.1);
+        }
+        .member-name h4 {
+            color: #f4d03f;
+            margin-bottom: 8px;
+            font-size: 1.2rem;
+        }
+        .member-name .role {
+            color: #bb8fce;
+            font-size: 0.95rem;
+            font-style: italic;
         }
         .project-section {
             background: rgba(255,255,255,0.05);
@@ -197,12 +209,30 @@
             </div>
             
             <div class="team-list">
-                <div class="member-name">Andrea Lombardi</div>
-                <div class="member-name">Samuele Romagnolo</div>
-                <div class="member-name">Diego Parisini</div>
-                <div class="member-name">Angelina Santi</div>
-                <div class="member-name">Marco Moli</div>
-                <div class="member-name">Davide Santucci</div>
+                <div class="member-name">
+                    <h4>Andrea Lombardi</h4>
+                    <span class="role">Cyberworld</span>
+                </div>
+                <div class="member-name">
+                    <h4>Diego Parisini</h4>
+                    <span class="role">Cyberworld</span>
+                </div>
+                <div class="member-name">
+                    <h4>Samuele Romagnolo</h4>
+                    <span class="role">AI</span>
+                </div>
+                <div class="member-name">
+                    <h4>Angelina Santi</h4>
+                    <span class="role">AI</span>
+                </div>
+                <div class="member-name">
+                    <h4>Davide Santucci</h4>
+                    <span class="role">AI</span>
+                </div>
+                <div class="member-name">
+                    <h4>Marco Moli</h4>
+                    <span class="role">IoT</span>
+                </div>
             </div>
         </div>
         
