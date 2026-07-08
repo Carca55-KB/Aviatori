@@ -170,6 +170,35 @@
             font-size: 0.9rem;
             margin-top: 20px;
         }
+        .admin-controls {
+            text-align: center;
+            margin-bottom: 30px;
+            display: none;
+        }
+        .reset-btn {
+            padding: 12px 30px;
+            font-size: 1rem;
+            font-family: 'Georgia', serif;
+            background: rgba(231, 76, 60, 0.2);
+            border: 2px solid #e74c3c;
+            color: #e74c3c;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .reset-btn:hover {
+            background: #e74c3c;
+            color: white;
+        }
+        .admin-badge {
+            background: #e74c3c;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-left: 10px;
+        }
     </style>
 </head>
 <body>
@@ -179,7 +208,7 @@
             <a href="index.html">Home</a>
             <a href="pilots.html" class="active">I sensi della volpe</a>
             <a href="webcam.html">Webcam</a>
-            <a href="login.html">Login</a>
+            <span id="auth-nav"></span>
         </div>
     </nav>
     
@@ -189,6 +218,10 @@
     </header>
 
     <div class="container">
+        <div class="admin-controls" id="admin-controls">
+            <button class="reset-btn" id="reset-btn">🗑️ Resetta tutti i dati</button>
+        </div>
+        
         <div class="sensors-grid">
             <div class="sensor-card">
                 <div class="sensor-icon">👆</div>
@@ -230,6 +263,56 @@
         const proximityValue = document.getElementById('proximity-value');
         const lastUpdate = document.getElementById('last-update');
         const historyBody = document.getElementById('history-body');
+        const adminControls = document.getElementById('admin-controls');
+        const resetBtn = document.getElementById('reset-btn');
+        const authNav = document.getElementById('auth-nav');
+        
+        let isAdmin = false;
+        
+        async function checkAuth() {
+            try {
+                const response = await fetch('/api/auth-status');
+                const data = await response.json();
+                isAdmin = data.isAdmin;
+                
+                if (isAdmin) {
+                    adminControls.style.display = 'block';
+                    authNav.innerHTML = '<a href="#" id="logout-btn" class="admin-badge">Esci</a>';
+                    document.getElementById('logout-btn').addEventListener('click', logout);
+                } else {
+                    authNav.innerHTML = '<a href="login.html">Login</a>';
+                }
+            } catch (err) {
+                console.error('Errore auth:', err);
+            }
+        }
+        
+        async function resetData() {
+            if (!confirm('Sei sicuro di voler eliminare tutti i dati dei sensori?')) return;
+            
+            try {
+                const response = await fetch('/api/sensors', {
+                    method: 'DELETE'
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    alert('Dati eliminati con successo!');
+                    loadSensorData();
+                } else {
+                    alert('Errore: ' + data.error);
+                }
+            } catch (err) {
+                alert('Errore di connessione');
+            }
+        }
+        
+        async function logout(e) {
+            e.preventDefault();
+            await fetch('/api/logout', { method: 'POST' });
+            window.location.reload();
+        }
         
         async function loadSensorData() {
             try {
@@ -266,6 +349,9 @@
         
         loadSensorData();
         setInterval(loadSensorData, 2000);
+        
+        resetBtn.addEventListener('click', resetData);
+        checkAuth();
     </script>
 </body>
 </html>

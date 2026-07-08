@@ -192,6 +192,19 @@ app.get('/api/test-data', async (req, res) => {
     }
 });
 
+app.delete('/api/sensors', async (req, res) => {
+    if (!req.session.isAdmin) {
+        return res.status(403).json({ error: 'Accesso negato' });
+    }
+    
+    try {
+        await pool.query('DELETE FROM sensor_data');
+        res.json({ message: 'Tutti i dati sono stati eliminati' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 server.listen(PORT, () => {
     console.log(`Server avviato sulla porta ${PORT}`);
 });
