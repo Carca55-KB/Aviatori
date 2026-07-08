@@ -244,8 +244,11 @@
             background: rgba(231, 76, 60, 0.2);
             border-color: #e74c3c;
             color: #e74c3c;
-            cursor: not-allowed;
-            opacity: 0.6;
+        }
+        .dislike-btn:hover {
+            background: #e74c3c;
+            color: white;
+            transform: scale(1.05);
         }
         .like-count {
             font-weight: bold;
@@ -320,7 +323,7 @@
                     <span>Like</span>
                     <span class="like-count" id="like-count">0</span>
                 </button>
-                <button class="dislike-btn" id="dislike-btn" title="I dislike non vengono conteggiati">
+                <button class="dislike-btn" id="dislike-btn">
                     <span>👎</span>
                     <span>Dislike</span>
                 </button>
@@ -365,7 +368,6 @@
         let audioContext = null;
         let audioWorkletNode = null;
         let mediaStreamAudioSourceNode = null;
-        let audioElement = null;
         
         async function checkAuth() {
             try {
@@ -400,23 +402,41 @@
                 viewerStatus.textContent = 'Ricezione trasmissione dall\'admin...';
                 viewerStatus.className = 'status success';
                 console.log('Frame ricevuto');
-                
-                if (!audioElement) {
-                    audioElement = new Audio();
-                    audioElement.autoplay = true;
-                }
             }
         });
         
+        let viewerAudioContext = null;
+        let audioQueue = [];
+        let isPlayingAudio = false;
+        
         socket.on('audio-frame', (data) => {
             if (!isAdmin && data) {
-                if (!audioElement) {
-                    audioElement = new Audio();
-                    audioElement.autoplay = true;
-                }
-                audioElement.src = data;
+                playAudioData(data);
             }
         });
+        
+        function playAudioData(audioData) {
+            try {
+                if (!viewerAudioContext) {
+                    viewerAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                
+                const floatData = new Float32Array(audioData.data.length);
+                for (let i = 0; i < audioData.data.length; i++) {
+                    floatData[i] = audioData.data[i] / 32768;
+                }
+                
+                const audioBuffer = viewerAudioContext.createBuffer(1, floatData.length, audioData.sampleRate || 44100);
+                audioBuffer.getChannelData(0).set(floatData);
+                
+                const source = viewerAudioContext.createBufferSource();
+                source.buffer = audioBuffer;
+                source.connect(viewerAudioContext.destination);
+                source.start();
+            } catch (err) {
+                console.error('Errore riproduzione audio:', err);
+            }
+        }
         
         socket.on('connect', () => {
             console.log('Socket connesso:', socket.id);
@@ -443,7 +463,13 @@
         });
         
         dislikeBtn.addEventListener('click', () => {
-            alert('I dislike non vengono conteggiati 😊');
+            socket.emit('add-like');
+            dislikeBtn.style.background = '#e74c3c';
+            dislikeBtn.style.color = 'white';
+            setTimeout(() => {
+                dislikeBtn.style.background = 'rgba(231, 76, 60, 0.2)';
+                dislikeBtn.style.color = '#e74c3c';
+            }, 300);
         });
         
         function updateZoom() {
@@ -539,21 +565,37 @@
                 return;
             }
             
-            const audioStream = new MediaStream(audioTracks);
-            const mediaRecorder = new MediaRecorder(audioStream, { mimeType: 'audio/webm' });
-            
-            mediaRecorder.ondataavailable = (event) => {
-                if (event.data.size > 0) {
-                    const reader = new FileReader();
-                    reader.onload = () => {
-                        socket.emit('audio-frame', reader.result);
-                    };
-                    reader.readAsDataURL(event.data);
-                }
-            };
-            
-            mediaRecorder.start(100);
-            console.log('Audio capture avviato');
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const source = audioContext.createMediaStreamSource(new MediaStream(audioTracks));
+                const processor = audioContext.createScriptProcessor(4096, 1, 1);
+                
+                processor.onaudioprocess = (e) => {
+                    if (!isTransmitting) return;
+                    
+                    const inputData = e.inputBuffer.getChannelData(0);
+                    const outputData = new Int16Array(inputData.length);
+                    
+                    for (let i = 0; i < inputData.length; i++) {
+                        outputData[i] = Math.max(-32768, Math.min(32767, inputData[i] * 32768));
+                    }
+                    
+                    socket.emit('audio-frame', {
+                        sampleRate: audioContext.sampleRate,
+                        data: Array.from(outputData)
+                    });
+                };
+                
+                source.connect(processor);
+                processor.connect(audioContext.destination);
+                
+                window.audioContextInstance = audioContext;
+                window.audioProcessor = processor;
+                
+                console.log('Audio capture avviato');
+            } catch (err) {
+                console.error('Errore audio capture:', err);
+            }
         }
         
         function stopWebcam() {
@@ -563,9 +605,18 @@
                 stream = null;
             }
             
-            if (audioElement) {
-                audioElement.pause();
-                audioElement.src = '';
+            if (window.audioProcessor) {
+                window.audioProcessor.disconnect();
+                window.audioProcessor = null;
+            }
+            if (window.audioContextInstance) {
+                window.audioContextInstance.close();
+                window.audioContextInstance = null;
+            }
+            
+            if (viewerAudioContext) {
+                viewerAudioContext.close();
+                viewerAudioContext = null;
             }
             
             zoomLevel = 1;
