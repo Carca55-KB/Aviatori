@@ -15,6 +15,42 @@
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
             min-height: 100vh;
             color: #e8d5b7;
+            padding-top: 70px;
+        }
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(10px);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+        }
+        nav .logo {
+            color: #f4d03f;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        nav .nav-links {
+            display: flex;
+            gap: 25px;
+        }
+        nav .nav-links a {
+            color: #e8d5b7;
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: color 0.3s;
+            padding: 8px 16px;
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+        nav .nav-links a:hover {
+            color: #f4d03f;
+            background: rgba(244, 208, 63, 0.1);
         }
         header {
             text-align: center;
@@ -132,10 +168,17 @@
 <body>
     <div class="stars" id="stars"></div>
     
-<header>
+    <nav>
+        <div class="logo">Il Piccolo Principe</div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="pilots.html">Piloti F1</a>
+        </div>
+    </nav>
+    
+    <header>
         <h1>Il Piccolo Principe</h1>
         <p>"Tutte le grandi persone sono stati bambini, ma poche se ne ricordano"</p>
-        <a href="pilots.html" style="display: inline-block; margin-top: 20px; color: #f4d03f; text-decoration: none; border: 1px solid #f4d03f; padding: 10px 25px; border-radius: 25px; transition: all 0.3s;">Vedi Piloti F1</a>
     </header>
 
     <div class="container">
