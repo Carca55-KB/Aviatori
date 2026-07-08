@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webcam - Il Piccolo Principe</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #e8d5b7;
+            padding-top: 70px;
+        }
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(10px);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+        }
+        nav .logo {
+            color: #f4d03f;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        nav .nav-links {
+            display: flex;
+            gap: 25px;
+        }
+        nav .nav-links a {
+            color: #e8d5b7;
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: color 0.3s;
+            padding: 8px 16px;
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+        nav .nav-links a:hover {
+            color: #f4d03f;
+            background: rgba(244, 208, 63, 0.1);
+        }
+        nav .nav-links a.active {
+            color: #f4d03f;
+            background: rgba(244, 208, 63, 0.15);
+        }
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(0,0,0,0.2);
+        }
+        header h1 {
+            font-size: 2.5rem;
+            color: #f4d03f;
+            margin-bottom: 10px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .video-container {
+            width: 100%;
+            max-width: 800px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            padding: 20px;
+            border: 2px solid rgba(244, 208, 63, 0.3);
+        }
+        #webcam {
+            width: 100%;
+            border-radius: 10px;
+            background: #000;
+        }
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .btn {
+            padding: 12px 30px;
+            font-size: 1rem;
+            font-family: 'Georgia', serif;
+            background: rgba(244, 208, 63, 0.2);
+            border: 2px solid #f4d03f;
+            color: #f4d03f;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn:hover {
+            background: #f4d03f;
+            color: #1a1a2e;
+        }
+        .btn.stop {
+            border-color: #e74c3c;
+            color: #e74c3c;
+            background: rgba(231, 76, 60, 0.2);
+        }
+        .btn.stop:hover {
+            background: #e74c3c;
+            color: white;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 15px 25px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            text-align: center;
+        }
+        .status.error {
+            background: rgba(231, 76, 60, 0.2);
+            border: 1px solid #e74c3c;
+        }
+        .status.success {
+            background: rgba(46, 204, 113, 0.2);
+            border: 1px solid #2ecc71;
+        }
+        .device-select {
+            margin-top: 20px;
+            width: 100%;
+            max-width: 400px;
+        }
+        .device-select label {
+            display: block;
+            margin-bottom: 8px;
+            color: #bb8fce;
+        }
+        .device-select select {
+            width: 100%;
+            padding: 12px 15px;
+            font-size: 1rem;
+            font-family: 'Georgia', serif;
+            background: rgba(255,255,255,0.1);
+            border: 2px solid #f4d03f;
+            border-radius: 10px;
+            color: #e8d5b7;
+            cursor: pointer;
+        }
+        .device-select select option {
+            background: #1a1a2e;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo">Il Piccolo Principe</div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="pilots.html">I sensi della volpe</a>
+            <a href="webcam.html" class="active">Webcam</a>
+        </div>
+    </nav>
+    
+    <header>
+        <h1>Webcam Live</h1>
+    </header>
+
+    <div class="container">
+        <div class="video-container">
+            <video id="webcam" autoplay playsinline></video>
+        </div>
+        
+        <div class="device-select" id="device-select-container" style="display: none;">
+            <label for="camera-select">Seleziona camera:</label>
+            <select id="camera-select"></select>
+        </div>
+        
+        <div class="controls">
+            <button class="btn" id="start-btn">Avvia Webcam</button>
+            <button class="btn stop" id="stop-btn" style="display: none;">Ferma Webcam</button>
+        </div>
+        
+        <div class="status" id="status">Clicca "Avvia Webcam" per iniziare</div>
+    </div>
+
+    <script>
+        const video = document.getElementById('webcam');
+        const startBtn = document.getElementById('start-btn');
+        const stopBtn = document.getElementById('stop-btn');
+        const status = document.getElementById('status');
+        const cameraSelect = document.getElementById('camera-select');
+        const deviceSelectContainer = document.getElementById('device-select-container');
+        
+        let stream = null;
+        
+        async function getCameras() {
+            try {
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                const cameras = devices.filter(device => device.kind === 'videoinput');
+                
+                if (cameras.length > 0) {
+                    deviceSelectContainer.style.display = 'block';
+                    cameraSelect.innerHTML = cameras.map((camera, index) => 
+                        `<option value="${camera.deviceId}">${camera.label || 'Camera ' + (index + 1)}</option>`
+                    ).join('');
+                }
+            } catch (err) {
+                console.error('Errore enumerateDevices:', err);
+            }
+        }
+        
+        async function startWebcam() {
+            try {
+                const deviceId = cameraSelect.value || null;
+                const constraints = {
+                    video: deviceId ? { deviceId: { exact: deviceId } } : true
+                };
+                
+                stream = await navigator.mediaDevices.getUserMedia(constraints);
+                video.srcObject = stream;
+                
+                status.textContent = 'Webcam attiva';
+                status.className = 'status success';
+                startBtn.style.display = 'none';
+                stopBtn.style.display = 'inline-block';
+                
+                await getCameras();
+                
+            } catch (err) {
+                status.textContent = 'Errore: ' + err.message;
+                status.className = 'status error';
+            }
+        }
+        
+        function stopWebcam() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                video.srcObject = null;
+                stream = null;
+            }
+            
+            status.textContent = 'Webcam fermata';
+            status.className = 'status';
+            startBtn.style.display = 'inline-block';
+            stopBtn.style.display = 'none';
+        }
+        
+        cameraSelect.addEventListener('change', () => {
+            if (stream) {
+                stopWebcam();
+                startWebcam();
+            }
+        });
+        
+        startBtn.addEventListener('click', startWebcam);
+        stopBtn.addEventListener('click', stopWebcam);
+        
+        getCameras();
+    </script>
+</body>
+</html>
