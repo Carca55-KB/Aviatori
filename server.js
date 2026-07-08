@@ -98,10 +98,10 @@ io.on('connection', (socket) => {
         io.emit('likes-update', totalLikes);
     });
     
-    socket.on('zoom-change', (zoomLevel) => {
+    socket.on('zoom-change', (data) => {
         if (socket.isAdmin) {
             viewerSockets.forEach(viewer => {
-                viewer.emit('zoom-change', zoomLevel);
+                viewer.emit('zoom-change', data);
             });
         }
     });

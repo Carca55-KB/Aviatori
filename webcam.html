@@ -103,6 +103,30 @@
             position: relative;
             cursor: zoom-in;
         }
+        .video-wrapper.fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 9999;
+            background: #000;
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .video-wrapper.fullscreen #webcam,
+        .video-wrapper.fullscreen #viewer-video {
+            max-width: 100%;
+            max-height: 100%;
+        }
+        .video-wrapper.panning {
+            cursor: grab;
+        }
+        .video-wrapper.panning:active {
+            cursor: grabbing;
+        }
         #webcam, #viewer-video {
             width: 100%;
             border-radius: 10px;
@@ -151,6 +175,33 @@
         .btn.stop:hover {
             background: #e74c3c;
             color: white;
+        }
+        .btn.fullscreen-btn {
+            border-color: #2ecc71;
+            color: #2ecc71;
+            background: rgba(46, 204, 113, 0.2);
+        }
+        .btn.fullscreen-btn:hover {
+            background: #2ecc71;
+            color: white;
+        }
+        .fullscreen-close {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+            background: rgba(231, 76, 60, 0.9);
+            border: none;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: none;
+        }
+        .fullscreen-close.visible {
+            display: block;
         }
         .status {
             margin-top: 20px;
@@ -296,6 +347,7 @@
     </style>
 </head>
 <body>
+    <button class="fullscreen-close" id="fullscreen-close">✕</button>
     <nav>
         <div class="logo">Il Piccolo Principe</div>
         <div class="nav-links">
@@ -332,6 +384,7 @@
             <div class="controls">
                 <button class="btn" id="start-btn">Avvia Trasmissione</button>
                 <button class="btn stop" id="stop-btn" style="display: none;">Ferma Trasmissione</button>
+                <button class="btn fullscreen-btn" id="admin-fullscreen-btn">⛶ Schermo Intero</button>
             </div>
             
             <div class="status" id="status">Clicca "Avvia Trasmissione" per iniziare</div>
@@ -339,11 +392,16 @@
         
         <div id="viewer-panel" style="display: none;">
             <div class="video-container">
-                <div class="video-wrapper">
+                <div class="video-wrapper" id="viewer-video-wrapper">
                     <img id="viewer-video" alt="Stream Admin" style="width: 100%; background: #000; border-radius: 10px;">
+                    <div class="zoom-info" id="viewer-zoom-info">Zoom: 1x</div>
                 </div>
             </div>
             <div class="status" id="viewer-status">In attesa della trasmissione dell'admin...</div>
+            
+            <div class="controls">
+                <button class="btn fullscreen-btn" id="viewer-fullscreen-btn">⛶ Schermo Intero</button>
+            </div>
             
             <div class="like-buttons">
                 <button class="like-btn" id="like-btn">
@@ -377,9 +435,18 @@
         let isAdmin = false;
         let stream = null;
         let zoomLevel = 1;
+        let viewerZoomLevel = 1;
         let minZoom = 1;
         let maxZoom = 5;
         let isTransmitting = false;
+        let isFullscreen = false;
+        let isPanning = false;
+        let panStartX = 0;
+        let panStartY = 0;
+        let panX = 0;
+        let panY = 0;
+        let viewerPanX = 0;
+        let viewerPanY = 0;
         
         const video = document.getElementById('webcam');
         const videoWrapper = document.getElementById('video-wrapper');
@@ -390,6 +457,8 @@
         const deviceSelectContainer = document.getElementById('device-select-container');
         const zoomInfo = document.getElementById('zoom-info');
         const viewerVideo = document.getElementById('viewer-video');
+        const viewerVideoWrapper = document.getElementById('viewer-video-wrapper');
+        const viewerZoomInfo = document.getElementById('viewer-zoom-info');
         const viewerStatus = document.getElementById('viewer-status');
         const adminPanel = document.getElementById('admin-panel');
         const viewerPanel = document.getElementById('viewer-panel');
@@ -400,6 +469,9 @@
         const dislikeBtn = document.getElementById('dislike-btn');
         const likeCount = document.getElementById('like-count');
         const likesDisplay = document.getElementById('likes-display');
+        const adminFullscreenBtn = document.getElementById('admin-fullscreen-btn');
+        const viewerFullscreenBtn = document.getElementById('viewer-fullscreen-btn');
+        const fullscreenClose = document.getElementById('fullscreen-close');
         
         let audioContext = null;
         let audioWorkletNode = null;
@@ -508,18 +580,66 @@
             }, 300);
         });
         
-        socket.on('zoom-change', (receivedZoomLevel) => {
+        socket.on('zoom-change', (data) => {
             if (!isAdmin && viewerVideo) {
-                viewerVideo.style.transform = `scale(${receivedZoomLevel})`;
+                viewerZoomLevel = data.zoom;
+                viewerPanX = data.panX || 0;
+                viewerPanY = data.panY || 0;
+                updateViewerTransform();
             }
         });
         
         function updateZoom() {
-            video.style.transform = `scale(${zoomLevel})`;
+            if (zoomLevel <= 1) {
+                panX = 0;
+                panY = 0;
+            }
+            video.style.transform = `scale(${zoomLevel}) translate(${panX}px, ${panY}px)`;
             zoomInfo.textContent = `Zoom: ${zoomLevel.toFixed(1)}x`;
-            videoWrapper.style.cursor = zoomLevel > 1 ? 'zoom-out' : 'zoom-in';
-            socket.emit('zoom-change', zoomLevel);
+            videoWrapper.style.cursor = zoomLevel > 1 ? 'grab' : 'zoom-in';
+            videoWrapper.classList.toggle('panning', zoomLevel > 1);
+            socket.emit('zoom-change', { zoom: zoomLevel, panX, panY });
         }
+        
+        function updateViewerTransform() {
+            viewerVideo.style.transform = `scale(${viewerZoomLevel}) translate(${viewerPanX}px, ${viewerPanY}px)`;
+            if (viewerZoomInfo) {
+                viewerZoomInfo.textContent = `Zoom: ${viewerZoomLevel.toFixed(1)}x`;
+            }
+            if (viewerVideoWrapper) {
+                viewerVideoWrapper.classList.toggle('panning', viewerZoomLevel > 1);
+            }
+        }
+        
+        function toggleFullscreen(wrapper) {
+            if (!isFullscreen) {
+                wrapper.classList.add('fullscreen');
+                fullscreenClose.classList.add('visible');
+                isFullscreen = true;
+            } else {
+                wrapper.classList.remove('fullscreen');
+                fullscreenClose.classList.remove('visible');
+                isFullscreen = false;
+            }
+        }
+        
+        fullscreenClose.addEventListener('click', () => {
+            if (isAdmin) {
+                videoWrapper.classList.remove('fullscreen');
+            } else {
+                viewerVideoWrapper.classList.remove('fullscreen');
+            }
+            fullscreenClose.classList.remove('visible');
+            isFullscreen = false;
+        });
+        
+        adminFullscreenBtn.addEventListener('click', () => {
+            toggleFullscreen(videoWrapper);
+        });
+        
+        viewerFullscreenBtn.addEventListener('click', () => {
+            toggleFullscreen(viewerVideoWrapper);
+        });
         
         async function getCameras() {
             try {
@@ -686,12 +806,36 @@
             updateZoom();
         });
         
-        videoWrapper.addEventListener('click', () => {
+        videoWrapper.addEventListener('mousedown', (e) => {
+            if (!stream || zoomLevel <= 1) return;
+            isPanning = true;
+            panStartX = e.clientX - panX;
+            panStartY = e.clientY - panY;
+            videoWrapper.style.cursor = 'grabbing';
+        });
+        
+        document.addEventListener('mousemove', (e) => {
+            if (!isPanning) return;
+            panX = (e.clientX - panStartX) / zoomLevel;
+            panY = (e.clientY - panStartY) / zoomLevel;
+            updateZoom();
+        });
+        
+        document.addEventListener('mouseup', () => {
+            isPanning = false;
+            if (zoomLevel > 1) {
+                videoWrapper.style.cursor = 'grab';
+            }
+        });
+        
+        videoWrapper.addEventListener('dblclick', () => {
             if (!stream) return;
-            if (zoomLevel >= maxZoom) {
+            if (zoomLevel > 1) {
                 zoomLevel = 1;
+                panX = 0;
+                panY = 0;
             } else {
-                zoomLevel = Math.min(maxZoom, zoomLevel + 0.5);
+                zoomLevel = 2;
             }
             updateZoom();
         });
