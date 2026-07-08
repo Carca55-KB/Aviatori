@@ -52,7 +52,9 @@ io.on('connection', (socket) => {
     socket.on('admin-join', () => {
         adminSocket = socket;
         socket.isAdmin = true;
-        console.log('Admin connesso');
+        totalLikes = 0;
+        io.emit('likes-update', totalLikes);
+        console.log('Admin connesso, like resettati');
     });
     
     socket.on('viewer-join', () => {
