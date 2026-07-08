@@ -40,6 +40,15 @@ pool.connect()
     .then(() => console.log('Connected to PostgreSQL'))
     .catch(err => console.error('Database connection error:', err));
 
+pool.query(`
+    CREATE TABLE IF NOT EXISTS sensor_data (
+        id SERIAL PRIMARY KEY,
+        touch BOOLEAN DEFAULT false,
+        proximity INTEGER DEFAULT 0,
+        timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+`).catch(err => console.error('Table creation error:', err));
+
 let adminSocket = null;
 let viewerSockets = new Set();
 let totalLikes = 0;
@@ -135,8 +144,21 @@ app.get('/api/auth-status', (req, res) => {
 
 app.get('/api/aviators', async (req, res) => {
     try {
-        const result = await pool.query('SELECT * FROM f1_drivers');
+        const result = await pool.query('SELECT * FROM sensor_data ORDER BY timestamp DESC LIMIT 100');
         res.json(result.rows);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.post('/api/sensors', async (req, res) => {
+    try {
+        const { touch, proximity } = req.body;
+        const result = await pool.query(
+            'INSERT INTO sensor_data (touch, proximity) VALUES ($1, $2) RETURNING *',
+            [touch, proximity]
+        );
+        res.json(result.rows[0]);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

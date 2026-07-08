@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>I sensi della volpe - Database</title>
+    <title>I sensi della volpe - Il Piccolo Principe</title>
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <style>
         * {
@@ -67,86 +67,108 @@
             color: #f4d03f;
             margin-bottom: 10px;
         }
+        header .subtitle {
+            color: #bb8fce;
+            font-style: italic;
+        }
         .container {
-            max-width: 600px;
+            max-width: 900px;
             margin: 0 auto;
             padding: 40px 20px;
         }
-        .dropdown-container {
-            margin-bottom: 30px;
+        .sensors-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
         }
-        .dropdown-container label {
-            display: block;
-            margin-bottom: 10px;
-            color: #bb8fce;
-            font-size: 1.1rem;
-        }
-        .dropdown-container select {
-            width: 100%;
-            padding: 15px 20px;
-            font-size: 1.1rem;
-            font-family: 'Georgia', serif;
-            background: rgba(255,255,255,0.1);
-            border: 2px solid #f4d03f;
-            border-radius: 10px;
-            color: #e8d5b7;
-            cursor: pointer;
-            outline: none;
-            transition: all 0.3s;
-        }
-        .dropdown-container select:hover {
-            background: rgba(255,255,255,0.15);
-        }
-        .dropdown-container select option {
-            background: #1a1a2e;
-            color: #e8d5b7;
-            padding: 10px;
-        }
-        .driver-details {
+        .sensor-card {
             background: rgba(255,255,255,0.1);
             border-radius: 15px;
             padding: 30px;
-            border-left: 4px solid #f4d03f;
-            display: none;
+            text-align: center;
+            border: 2px solid rgba(244, 208, 63, 0.3);
+            transition: all 0.3s;
         }
-        .driver-details.active {
-            display: block;
-            animation: fadeIn 0.3s ease;
+        .sensor-card:hover {
+            border-color: #f4d03f;
+            transform: translateY(-5px);
         }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .sensor-card h3 {
+            color: #f4d03f;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
         }
-        .driver-details h2 {
+        .sensor-value {
+            font-size: 3rem;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        .sensor-value.active {
+            color: #2ecc71;
+        }
+        .sensor-value.inactive {
+            color: #e74c3c;
+        }
+        .sensor-label {
+            color: #bb8fce;
+            font-size: 1rem;
+        }
+        .sensor-icon {
+            font-size: 4rem;
+            margin-bottom: 10px;
+        }
+        .history-section {
+            margin-top: 50px;
+        }
+        .history-section h2 {
             color: #f4d03f;
             margin-bottom: 20px;
-            font-size: 1.8rem;
+            text-align: center;
         }
-        .driver-details .info-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px 0;
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .history-table th, .history-table td {
+            padding: 15px;
+            text-align: center;
             border-bottom: 1px solid rgba(255,255,255,0.1);
         }
-        .driver-details .info-label {
-            color: #888;
+        .history-table th {
+            background: rgba(244, 208, 63, 0.2);
+            color: #f4d03f;
         }
-        .driver-details .info-value {
-            color: #e8d5b7;
+        .history-table tr:hover {
+            background: rgba(255,255,255,0.05);
+        }
+        .status-badge {
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 0.85rem;
             font-weight: bold;
         }
-        .driver-details .number-badge {
-            display: inline-block;
-            background: #e74c3c;
-            color: white;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 1rem;
+        .status-badge.on {
+            background: rgba(46, 204, 113, 0.2);
+            color: #2ecc71;
+        }
+        .status-badge.off {
+            background: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
         }
         .loading {
             text-align: center;
             padding: 50px;
             color: #bb8fce;
+        }
+        .update-info {
+            text-align: center;
+            color: #888;
+            font-size: 0.9rem;
+            margin-top: 20px;
         }
     </style>
 </head>
@@ -163,85 +185,87 @@
     
     <header>
         <h1>I sensi della volpe</h1>
+        <p class="subtitle">Dati dei sensori del robot in tempo reale</p>
     </header>
 
     <div class="container">
-        <div class="dropdown-container">
-            <label for="driver-select">Seleziona un pilota:</label>
-            <select id="driver-select">
-                <option value="">-- Caricamento piloti... --</option>
-            </select>
-        </div>
-        
-        <div id="driver-details" class="driver-details">
-            <h2 id="driver-name">Nome Pilota</h2>
-            <div class="info-row">
-                <span class="info-label">Numero</span>
-                <span class="info-value"><span id="driver-number" class="number-badge">#1</span></span>
+        <div class="sensors-grid">
+            <div class="sensor-card">
+                <div class="sensor-icon">👆</div>
+                <h3>Sensore Tocco</h3>
+                <div class="sensor-value" id="touch-value">--</div>
+                <div class="sensor-label">Stato: <span id="touch-status">Caricamento...</span></div>
             </div>
-            <div class="info-row">
-                <span class="info-label">Team</span>
-                <span id="driver-team" class="info-value">Team</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">Paese</span>
-                <span id="driver-country" class="info-value">Paese</span>
+            
+            <div class="sensor-card">
+                <div class="sensor-icon">📡</div>
+                <h3>Sensore Prossimità</h3>
+                <div class="sensor-value" id="proximity-value">--</div>
+                <div class="sensor-label">Distanza rilevata</div>
             </div>
         </div>
         
-        <div id="loading" class="loading">Caricamento dati...</div>
+        <div class="update-info">Ultimo aggiornamento: <span id="last-update">--</span></div>
+        
+        <div class="history-section">
+            <h2>Storico Letture</h2>
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>Sensore Tocco</th>
+                        <th>Prossimità</th>
+                    </tr>
+                </thead>
+                <tbody id="history-body">
+                    <tr><td colspan="3" class="loading">Caricamento dati...</td></tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <script>
-        let drivers = [];
+        const touchValue = document.getElementById('touch-value');
+        const touchStatus = document.getElementById('touch-status');
+        const proximityValue = document.getElementById('proximity-value');
+        const lastUpdate = document.getElementById('last-update');
+        const historyBody = document.getElementById('history-body');
         
-        async function loadDrivers() {
-            const select = document.getElementById('driver-select');
-            const details = document.getElementById('driver-details');
-            const loading = document.getElementById('loading');
-            
+        async function loadSensorData() {
             try {
                 const response = await fetch('/api/aviators');
-                if (!response.ok) throw new Error('Errore nel caricamento');
+                const data = await response.json();
                 
-                drivers = await response.json();
-                
-                select.innerHTML = '<option value="">-- Seleziona un pilota --</option>';
-                drivers.forEach(driver => {
-                    const option = document.createElement('option');
-                    option.value = driver.id;
-                    option.textContent = `${driver.name} (#${driver.number})`;
-                    select.appendChild(option);
-                });
-                
-                loading.style.display = 'none';
-                
-            } catch (error) {
-                select.innerHTML = '<option value="">Errore nel caricamento</option>';
-                loading.textContent = 'Errore: ' + error.message;
+                if (data.length > 0) {
+                    const latest = data[0];
+                    
+                    touchValue.textContent = latest.touch ? 'ATTIVO' : 'INATTIVO';
+                    touchValue.className = 'sensor-value ' + (latest.touch ? 'active' : 'inactive');
+                    touchStatus.textContent = latest.touch ? 'Toccato' : 'Non toccato';
+                    
+                    proximityValue.textContent = latest.proximity + ' cm';
+                    proximityValue.className = 'sensor-value ' + (latest.proximity < 10 ? 'active' : '');
+                    
+                    lastUpdate.textContent = new Date(latest.timestamp).toLocaleString('it-IT');
+                    
+                    historyBody.innerHTML = data.slice(0, 20).map(row => `
+                        <tr>
+                            <td>${new Date(row.timestamp).toLocaleString('it-IT')}</td>
+                            <td><span class="status-badge ${row.touch ? 'on' : 'off'}">${row.touch ? 'Toccato' : 'Non toccato'}</span></td>
+                            <td>${row.proximity} cm</td>
+                        </tr>
+                    `).join('');
+                } else {
+                    historyBody.innerHTML = '<tr><td colspan="3">Nessun dato disponibile</td></tr>';
+                }
+            } catch (err) {
+                console.error('Errore caricamento dati:', err);
+                historyBody.innerHTML = '<tr><td colspan="3">Errore nel caricamento</td></tr>';
             }
         }
         
-        document.getElementById('driver-select').addEventListener('change', function() {
-            const details = document.getElementById('driver-details');
-            const selectedId = this.value;
-            
-            if (!selectedId) {
-                details.classList.remove('active');
-                return;
-            }
-            
-            const driver = drivers.find(d => d.id == selectedId);
-            if (driver) {
-                document.getElementById('driver-name').textContent = driver.name;
-                document.getElementById('driver-number').textContent = '#' + driver.number;
-                document.getElementById('driver-team').textContent = driver.team;
-                document.getElementById('driver-country').textContent = driver.country;
-                details.classList.add('active');
-            }
-        });
-        
-        loadDrivers();
+        loadSensorData();
+        setInterval(loadSensorData, 2000);
     </script>
 </body>
 </html>
