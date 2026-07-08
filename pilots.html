@@ -38,70 +38,85 @@
             color: #f4d03f;
         }
         .container {
-            max-width: 1000px;
+            max-width: 600px;
             margin: 0 auto;
             padding: 40px 20px;
         }
-        .drivers-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 25px;
-            margin-top: 30px;
+        .dropdown-container {
+            margin-bottom: 30px;
         }
-        .driver-card {
+        .dropdown-container label {
+            display: block;
+            margin-bottom: 10px;
+            color: #bb8fce;
+            font-size: 1.1rem;
+        }
+        .dropdown-container select {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 1.1rem;
+            font-family: 'Georgia', serif;
+            background: rgba(255,255,255,0.1);
+            border: 2px solid #f4d03f;
+            border-radius: 10px;
+            color: #e8d5b7;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.3s;
+        }
+        .dropdown-container select:hover {
+            background: rgba(255,255,255,0.15);
+        }
+        .dropdown-container select option {
+            background: #1a1a2e;
+            color: #e8d5b7;
+            padding: 10px;
+        }
+        .driver-details {
             background: rgba(255,255,255,0.1);
             border-radius: 15px;
-            padding: 25px;
+            padding: 30px;
             border-left: 4px solid #f4d03f;
-            transition: transform 0.3s, box-shadow 0.3s;
+            display: none;
         }
-        .driver-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(243, 156, 18, 0.2);
+        .driver-details.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
         }
-        .driver-number {
-            font-size: 3rem;
-            color: #e74c3c;
-            font-weight: bold;
-            float: right;
-            opacity: 0.8;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        .driver-card h3 {
+        .driver-details h2 {
             color: #f4d03f;
-            margin-bottom: 10px;
-            font-size: 1.4rem;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
         }
-        .driver-card .team {
-            color: #bb8fce;
-            font-style: italic;
-            margin-bottom: 5px;
+        .driver-details .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
         }
-        .driver-card .country {
+        .driver-details .info-label {
             color: #888;
-            font-size: 0.9rem;
+        }
+        .driver-details .info-value {
+            color: #e8d5b7;
+            font-weight: bold;
+        }
+        .driver-details .number-badge {
+            display: inline-block;
+            background: #e74c3c;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 1rem;
         }
         .loading {
             text-align: center;
             padding: 50px;
             color: #bb8fce;
-            font-size: 1.2rem;
-        }
-        .error {
-            text-align: center;
-            padding: 50px;
-            color: #e74c3c;
-        }
-        .stats-box {
-            background: rgba(255,255,255,0.1);
-            border-radius: 15px;
-            padding: 20px 30px;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-        .stats-box span {
-            color: #f4d03f;
-            font-weight: bold;
-            font-size: 1.5rem;
         }
     </style>
 </head>
@@ -112,44 +127,80 @@
     </header>
 
     <div class="container">
-        <div class="stats-box">
-            Piloti nel database: <span id="driver-count">0</span>
+        <div class="dropdown-container">
+            <label for="driver-select">Seleziona un pilota:</label>
+            <select id="driver-select">
+                <option value="">-- Caricamento piloti... --</option>
+            </select>
         </div>
-        <div id="drivers-container" class="drivers-grid">
-            <div class="loading">Caricamento dati dal database...</div>
+        
+        <div id="driver-details" class="driver-details">
+            <h2 id="driver-name">Nome Pilota</h2>
+            <div class="info-row">
+                <span class="info-label">Numero</span>
+                <span class="info-value"><span id="driver-number" class="number-badge">#1</span></span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Team</span>
+                <span id="driver-team" class="info-value">Team</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Paese</span>
+                <span id="driver-country" class="info-value">Paese</span>
+            </div>
         </div>
+        
+        <div id="loading" class="loading">Caricamento dati...</div>
     </div>
 
     <script>
+        let drivers = [];
+        
         async function loadDrivers() {
-            const container = document.getElementById('drivers-container');
-            const countEl = document.getElementById('driver-count');
+            const select = document.getElementById('driver-select');
+            const details = document.getElementById('driver-details');
+            const loading = document.getElementById('loading');
             
             try {
                 const response = await fetch('/api/aviators');
                 if (!response.ok) throw new Error('Errore nel caricamento');
                 
-                const drivers = await response.json();
-                countEl.textContent = drivers.length;
+                drivers = await response.json();
                 
-                if (drivers.length === 0) {
-                    container.innerHTML = '<div class="error">Nessun pilota trovato nel database</div>';
-                    return;
-                }
+                select.innerHTML = '<option value="">-- Seleziona un pilota --</option>';
+                drivers.forEach(driver => {
+                    const option = document.createElement('option');
+                    option.value = driver.id;
+                    option.textContent = `${driver.name} (#${driver.number})`;
+                    select.appendChild(option);
+                });
                 
-                container.innerHTML = drivers.map(driver => `
-                    <div class="driver-card">
-                        <div class="driver-number">#${driver.number}</div>
-                        <h3>${driver.name}</h3>
-                        <p class="team">${driver.team}</p>
-                        <p class="country">Paese: ${driver.country}</p>
-                    </div>
-                `).join('');
+                loading.style.display = 'none';
                 
             } catch (error) {
-                container.innerHTML = `<div class="error">Errore: ${error.message}</div>`;
+                select.innerHTML = '<option value="">Errore nel caricamento</option>';
+                loading.textContent = 'Errore: ' + error.message;
             }
         }
+        
+        document.getElementById('driver-select').addEventListener('change', function() {
+            const details = document.getElementById('driver-details');
+            const selectedId = this.value;
+            
+            if (!selectedId) {
+                details.classList.remove('active');
+                return;
+            }
+            
+            const driver = drivers.find(d => d.id == selectedId);
+            if (driver) {
+                document.getElementById('driver-name').textContent = driver.name;
+                document.getElementById('driver-number').textContent = '#' + driver.number;
+                document.getElementById('driver-team').textContent = driver.team;
+                document.getElementById('driver-country').textContent = driver.country;
+                details.classList.add('active');
+            }
+        });
         
         loadDrivers();
     </script>
