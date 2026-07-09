@@ -169,13 +169,16 @@
         .planet-re img {
             filter: sepia(0.4) saturate(1.8) hue-rotate(200deg) drop-shadow(0 0 80px rgba(138, 43, 226, 0.8));
         }
+        .planet-re img {
+            filter: sepia(0.4) saturate(1.8) hue-rotate(200deg) drop-shadow(0 0 80px rgba(138, 43, 226, 0.8));
+        }
         .planet-vanitoso { width: 400px; }
         .planet-vanitoso.active {
             transform: translate(-50%, -50%) scale(1) translate(-380px, 180px);
             animation: float3 5s ease-in-out infinite;
         }
         .planet-vanitoso img {
-            filter: sepia(0.2) saturate(2) hue-rotate(320deg) drop-shadow(0 0 80px rgba(255, 105, 180, 0.8));
+            filter: sepia(0.3) saturate(2) hue-rotate(300deg) brightness(1.1) drop-shadow(0 0 80px rgba(255, 105, 180, 0.8));
         }
         .planet-uomo { width: 380px; }
         .planet-uomo.active {
@@ -183,7 +186,7 @@
             animation: float4 8s ease-in-out infinite;
         }
         .planet-uomo img {
-            filter: sepia(0.5) saturate(1.5) hue-rotate(30deg) drop-shadow(0 0 80px rgba(218, 165, 32, 0.8));
+            filter: sepia(0.5) saturate(1.8) hue-rotate(20deg) drop-shadow(0 0 80px rgba(218, 165, 32, 0.8));
         }
         .planet-lampione { width: 360px; }
         .planet-lampione.active {
@@ -191,7 +194,7 @@
             animation: float5 6s ease-in-out infinite;
         }
         .planet-lampione img {
-            filter: sepia(0.2) saturate(2.5) hue-rotate(5deg) brightness(1.3) drop-shadow(0 0 100px rgba(255, 215, 0, 1));
+            filter: sepia(0.2) saturate(2.5) hue-rotate(5deg) brightness(1.4) drop-shadow(0 0 100px rgba(255, 215, 0, 1));
         }
         .planet-geografo { width: 440px; }
         .planet-geografo.active {
@@ -199,7 +202,7 @@
             animation: float6 7s ease-in-out infinite;
         }
         .planet-geografo img {
-            filter: sepia(0.6) saturate(1.3) hue-rotate(180deg) drop-shadow(0 0 80px rgba(70, 130, 180, 0.8));
+            filter: sepia(0.5) saturate(1.5) hue-rotate(190deg) brightness(1.1) drop-shadow(0 0 80px rgba(70, 130, 180, 0.8));
         }
         .planet-baobab { width: 410px; }
         .planet-baobab.active {
@@ -207,7 +210,7 @@
             animation: float7 8s ease-in-out infinite;
         }
         .planet-baobab img {
-            filter: sepia(0.5) saturate(2) hue-rotate(80deg) drop-shadow(0 0 80px rgba(74, 124, 78, 0.8));
+            filter: sepia(0.3) saturate(2) hue-rotate(90deg) brightness(1.1) drop-shadow(0 0 80px rgba(74, 124, 78, 0.8));
         }
         .planet-rosa { width: 320px; }
         .planet-rosa.active {
@@ -215,7 +218,7 @@
             animation: float8 5s ease-in-out infinite;
         }
         .planet-rosa img {
-            filter: sepia(0.3) saturate(2.5) hue-rotate(300deg) drop-shadow(0 0 80px rgba(255, 20, 147, 0.8));
+            filter: sepia(0.2) saturate(2.5) hue-rotate(290deg) brightness(1.2) drop-shadow(0 0 80px rgba(255, 20, 147, 0.8));
         }
         .planet-name {
             position: absolute;
@@ -372,15 +375,15 @@
             <span class="planet-name">L'Asteroide B-612</span>
         </div>
         <div class="planet planet-re" id="re">
-            <img src="121985_4-fotor-bg-remover-2026070817346.png" alt="Re">
+            <img src="pngtree-venus-planet-isolated-on-white-background-png-image_20787579.png" alt="Re">
             <span class="planet-name">Il Pianeta del Re</span>
         </div>
         <div class="planet planet-vanitoso" id="vanitoso">
-            <img src="121985_4-fotor-bg-remover-2026070817346.png" alt="Vanitoso">
+            <img src="raf,360x360,075,t,fafafa_ca443f4786.jpg" alt="Vanitoso">
             <span class="planet-name">Il Pianeta del Vanitoso</span>
         </div>
         <div class="planet planet-uomo" id="uomo">
-            <img src="121985_4-fotor-bg-remover-2026070817346.png" alt="Uomo d'affari">
+            <img src="326.webp" alt="Uomo d'affari">
             <span class="planet-name">Il Pianeta dell'Uomo d'Affari</span>
         </div>
         <div class="planet planet-lampione" id="lampione">
@@ -388,15 +391,15 @@
             <span class="planet-name">Il Pianeta del Lampione</span>
         </div>
         <div class="planet planet-geografo" id="geografo">
-            <img src="121985_4-fotor-bg-remover-2026070817346.png" alt="Geografo">
+            <img src="pngtree-venus-planet-isolated-on-white-background-png-image_20787579.png" alt="Geografo">
             <span class="planet-name">Il Pianeta del Geografo</span>
         </div>
         <div class="planet planet-baobab" id="baobab">
-            <img src="121985_4-fotor-bg-remover-2026070817346.png" alt="Baobab">
+            <img src="IL-PICCOLO-PRINCIPE-ALBERI.jpg" alt="Baobab">
             <span class="planet-name">Il Pianeta dei Baobab</span>
         </div>
         <div class="planet planet-rosa" id="rosa">
-            <img src="121985_4-fotor-bg-remover-2026070817346.png" alt="Rosa">
+            <img src="il-piccolo-principe-elefanti.jpg" alt="Rosa">
             <span class="planet-name">Il Pianeta della Rosa</span>
         </div>
     </div>
@@ -479,7 +482,6 @@
                     modalTitle.textContent = info.name;
                     modalDesc.textContent = info.desc;
                     modalImg.src = planet.querySelector('img').src;
-                    modalImg.style.filter = planet.querySelector('img').style.filter;
                     modal.classList.add('visible');
                 }
             });
