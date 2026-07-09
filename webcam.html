@@ -451,22 +451,88 @@
             
             <div class="status" id="status">Clicca "Avvia Trasmissione" per iniziare</div>
             
-            <div class="planets-control" style="margin-top: 40px; padding: 30px; background: rgba(255,255,255,0.05); border-radius: 20px; border: 2px solid rgba(187, 143, 206, 0.3);">
-                <h3 style="color: #f4d03f; margin-bottom: 20px; text-align: center;">Controllo Pianeti</h3>
-                <p style="color: #bb8fce; text-align: center; margin-bottom: 20px; font-size: 0.9rem;">Attiva i pianeti sulla pagina Pianeti</p>
-                <div style="display: flex; flex-wrap: wrap; gap: 15px; justify-content: center;">
-                    <button class="btn planet-btn" id="btn-asteroide" data-planet="asteroide" style="border-color: #f4a460; color: #f4a460;">Asteroide B-612</button>
-                    <button class="btn planet-btn" id="btn-re" data-planet="re" style="border-color: #8a2be2; color: #8a2be2;">Pianeta Re</button>
-                    <button class="btn planet-btn" id="btn-vanitoso" data-planet="vanitoso" style="border-color: #ff69b4; color: #ff69b4;">Pianeta Vanitoso</button>
-                    <button class="btn planet-btn" id="btn-uomo" data-planet="uomo" style="border-color: #daa520; color: #daa520;">Pianeta Uomo d'Affari</button>
-                    <button class="btn planet-btn" id="btn-lampione" data-planet="lampione" style="border-color: #ffd700; color: #ffd700;">Pianeta Lampione</button>
-                    <button class="btn planet-btn" id="btn-geografo" data-planet="geografo" style="border-color: #4682b4; color: #4682b4;">Pianeta Geografo</button>
-                    <button class="btn planet-btn" id="btn-baobab" data-planet="baobab" style="border-color: #4a7c4e; color: #4a7c4e;">Pianeta Baobab</button>
+            <div class="planets-control" style="margin-top: 40px; padding: 35px; background: linear-gradient(135deg, rgba(52, 73, 94, 0.3) 0%, rgba(44, 62, 80, 0.3) 100%); border-radius: 25px; border: 2px solid rgba(241, 196, 15, 0.4); box-shadow: 0 10px 40px rgba(0,0,0,0.3);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                    <h3 style="color: #f1c40f; font-size: 1.5rem;">Pannello Controllo Pianeti</h3>
+                    <span style="color: #3498db; font-size: 0.85rem; background: rgba(52, 152, 219, 0.2); padding: 5px 15px; border-radius: 15px;">ADMIN MODE</span>
                 </div>
-                <div style="text-align: center; margin-top: 15px;">
-                    <button class="btn stop" id="btn-reset-planets">Resetta Tutti</button>
+                <p style="color: #95a5a6; text-align: center; margin-bottom: 25px; font-size: 0.9rem;">Seleziona i pianeti da visualizzare sulla pagina Pianeti</p>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 20px;">
+                    <button class="planet-btn" id="btn-asteroide" data-planet="asteroide">
+                        <span class="planet-icon" style="background: linear-gradient(135deg, #f39c12, #e67e22);">🪨</span>
+                        <span class="planet-text">Asteroide B-612</span>
+                    </button>
+                    <button class="planet-btn" id="btn-re" data-planet="re">
+                        <span class="planet-icon" style="background: linear-gradient(135deg, #9b59b6, #8e44ad);">👑</span>
+                        <span class="planet-text">Pianeta del Re</span>
+                    </button>
+                    <button class="planet-btn" id="btn-vanitoso" data-planet="vanitoso">
+                        <span class="planet-icon" style="background: linear-gradient(135deg, #e91e63, #c2185b);">🎩</span>
+                        <span class="planet-text">Pianeta Vanitoso</span>
+                    </button>
+                    <button class="planet-btn" id="btn-uomo" data-planet="uomo">
+                        <span class="planet-icon" style="background: linear-gradient(135deg, #f39c12, #d68910);">💰</span>
+                        <span class="planet-text">Uomo d'Affari</span>
+                    </button>
+                    <button class="planet-btn" id="btn-lampione" data-planet="lampione">
+                        <span class="planet-icon" style="background: linear-gradient(135deg, #f1c40f, #f39c12);">💡</span>
+                        <span class="planet-text">Pianeta Lampione</span>
+                    </button>
+                    <button class="planet-btn" id="btn-geografo" data-planet="geografo">
+                        <span class="planet-icon" style="background: linear-gradient(135deg, #3498db, #2980b9);">📚</span>
+                        <span class="planet-text">Pianeta Geografo</span>
+                    </button>
+                    <button class="planet-btn" id="btn-terra" data-planet="terra">
+                        <span class="planet-icon" style="background: linear-gradient(135deg, #27ae60, #229954);">🌍</span>
+                        <span class="planet-text">Terra</span>
+                    </button>
+                </div>
+                
+                <div style="display: flex; gap: 15px; justify-content: center; margin-top: 20px;">
+                    <button class="btn" id="btn-activate-all" style="background: rgba(46, 204, 113, 0.2); border-color: #2ecc71; color: #2ecc71;">Attiva Tutti</button>
+                    <button class="btn stop" id="btn-reset-planets">Resetta</button>
                 </div>
             </div>
+            
+            <style>
+                .planet-btn {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    padding: 15px;
+                    background: rgba(255,255,255,0.05);
+                    border: 2px solid rgba(255,255,255,0.1);
+                    border-radius: 12px;
+                    cursor: pointer;
+                    transition: all 0.3s;
+                    font-family: 'Georgia', serif;
+                }
+                .planet-btn:hover {
+                    background: rgba(255,255,255,0.1);
+                    border-color: rgba(255,255,255,0.3);
+                    transform: translateY(-2px);
+                }
+                .planet-btn.active {
+                    border-color: #f1c40f;
+                    background: rgba(241, 196, 15, 0.15);
+                    box-shadow: 0 0 20px rgba(241, 196, 15, 0.3);
+                }
+                .planet-icon {
+                    width: 35px;
+                    height: 35px;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 1.1rem;
+                }
+                .planet-text {
+                    color: #ecf0f1;
+                    font-size: 0.9rem;
+                    font-weight: 500;
+                }
+            </style>
         </div>
         
         <div id="viewer-panel" style="display: none;">
@@ -958,12 +1024,20 @@
                 
                 if (isActive) {
                     btn.classList.remove('active');
-                    btn.style.background = 'transparent';
                     socket.emit('planet-deactivate', { planet });
                 } else {
                     btn.classList.add('active');
-                    btn.style.background = btn.style.borderColor;
-                    btn.style.color = '#1a1a2e';
+                    socket.emit('planet-activate', { planet });
+                }
+            });
+        });
+        
+        document.getElementById('btn-activate-all').addEventListener('click', () => {
+            const planets = ['asteroide', 're', 'vanitoso', 'uomo', 'lampione', 'geografo', 'terra'];
+            planets.forEach(planet => {
+                const btn = document.querySelector(`[data-planet="${planet}"]`);
+                if (btn && !btn.classList.contains('active')) {
+                    btn.classList.add('active');
                     socket.emit('planet-activate', { planet });
                 }
             });
@@ -972,8 +1046,6 @@
         document.getElementById('btn-reset-planets').addEventListener('click', () => {
             document.querySelectorAll('.planet-btn').forEach(btn => {
                 btn.classList.remove('active');
-                btn.style.background = 'transparent';
-                btn.style.color = btn.style.borderColor;
             });
             socket.emit('planet-deactivate-all');
         });
