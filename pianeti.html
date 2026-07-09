@@ -26,10 +26,10 @@
             height: 100%;
             background: url('Starry-Sky-scaled-1-1536x1024.jpg') center center / cover no-repeat;
             z-index: -2;
-            transition: opacity 1s ease;
+            transition: all 1s ease;
         }
         .sky-bg.dimmed {
-            opacity: 0.3;
+            filter: brightness(0.15);
         }
         .stars {
             position: fixed;
@@ -112,6 +112,7 @@
             padding: 100px 20px 40px;
             position: relative;
             z-index: 1;
+            transition: opacity 0.5s ease;
         }
         header h1 {
             font-size: 3rem;
@@ -147,60 +148,84 @@
         .planet img {
             width: 100%;
             height: auto;
-            filter: drop-shadow(0 0 40px rgba(255, 255, 255, 0.4));
+            filter: drop-shadow(0 0 60px rgba(255, 255, 255, 0.5));
         }
         .planet.active {
             opacity: 1;
         }
-        .planet-asteroide {
-            width: 350px;
-        }
+        .planet-asteroide { width: 450px; }
         .planet-asteroide.active {
-            transform: translate(-50%, -50%) scale(1) translate(-200px, -150px);
+            transform: translate(-50%, -50%) scale(1) translate(-350px, -220px);
             animation: float1 6s ease-in-out infinite;
         }
         .planet-asteroide img {
-            filter: sepia(0.3) saturate(1.5) hue-rotate(-10deg) drop-shadow(0 0 60px rgba(244, 164, 96, 0.6));
+            filter: sepia(0.3) saturate(1.5) hue-rotate(-10deg) drop-shadow(0 0 80px rgba(244, 164, 96, 0.8));
         }
-        .planet-baobab {
-            width: 320px;
-        }
-        .planet-baobab.active {
-            transform: translate(-50%, -50%) scale(1) translate(200px, -120px);
+        .planet-re { width: 420px; }
+        .planet-re.active {
+            transform: translate(-50%, -50%) scale(1) translate(350px, -200px);
             animation: float2 7s ease-in-out infinite;
         }
-        .planet-baobab img {
-            filter: sepia(0.5) saturate(2) hue-rotate(80deg) drop-shadow(0 0 60px rgba(74, 124, 78, 0.6));
+        .planet-re img {
+            filter: sepia(0.4) saturate(1.8) hue-rotate(200deg) drop-shadow(0 0 80px rgba(138, 43, 226, 0.8));
         }
-        .planet-pecora {
-            width: 280px;
-        }
-        .planet-pecora.active {
-            transform: translate(-50%, -50%) scale(1) translate(-180px, 180px);
+        .planet-vanitoso { width: 400px; }
+        .planet-vanitoso.active {
+            transform: translate(-50%, -50%) scale(1) translate(-380px, 180px);
             animation: float3 5s ease-in-out infinite;
         }
-        .planet-pecora img {
-            filter: grayscale(0.2) brightness(1.1) drop-shadow(0 0 60px rgba(200, 200, 200, 0.6));
+        .planet-vanitoso img {
+            filter: sepia(0.2) saturate(2) hue-rotate(320deg) drop-shadow(0 0 80px rgba(255, 105, 180, 0.8));
         }
-        .planet-lampione {
-            width: 260px;
-        }
-        .planet-lampione.active {
-            transform: translate(-50%, -50%) scale(1) translate(200px, 150px);
+        .planet-uomo { width: 380px; }
+        .planet-uomo.active {
+            transform: translate(-50%, -50%) scale(1) translate(320px, 220px);
             animation: float4 8s ease-in-out infinite;
         }
+        .planet-uomo img {
+            filter: sepia(0.5) saturate(1.5) hue-rotate(30deg) drop-shadow(0 0 80px rgba(218, 165, 32, 0.8));
+        }
+        .planet-lampione { width: 360px; }
+        .planet-lampione.active {
+            transform: translate(-50%, -50%) scale(1) translate(-200px, -350px);
+            animation: float5 6s ease-in-out infinite;
+        }
         .planet-lampione img {
-            filter: sepia(0.2) saturate(2.5) hue-rotate(5deg) brightness(1.2) drop-shadow(0 0 80px rgba(255, 215, 0, 0.8));
+            filter: sepia(0.2) saturate(2.5) hue-rotate(5deg) brightness(1.3) drop-shadow(0 0 100px rgba(255, 215, 0, 1));
+        }
+        .planet-geografo { width: 440px; }
+        .planet-geografo.active {
+            transform: translate(-50%, -50%) scale(1) translate(250px, -320px);
+            animation: float6 7s ease-in-out infinite;
+        }
+        .planet-geografo img {
+            filter: sepia(0.6) saturate(1.3) hue-rotate(180deg) drop-shadow(0 0 80px rgba(70, 130, 180, 0.8));
+        }
+        .planet-baobab { width: 410px; }
+        .planet-baobab.active {
+            transform: translate(-50%, -50%) scale(1) translate(-350px, 50px);
+            animation: float7 8s ease-in-out infinite;
+        }
+        .planet-baobab img {
+            filter: sepia(0.5) saturate(2) hue-rotate(80deg) drop-shadow(0 0 80px rgba(74, 124, 78, 0.8));
+        }
+        .planet-rosa { width: 320px; }
+        .planet-rosa.active {
+            transform: translate(-50%, -50%) scale(1) translate(380px, 80px);
+            animation: float8 5s ease-in-out infinite;
+        }
+        .planet-rosa img {
+            filter: sepia(0.3) saturate(2.5) hue-rotate(300deg) drop-shadow(0 0 80px rgba(255, 20, 147, 0.8));
         }
         .planet-name {
             position: absolute;
-            bottom: -50px;
+            bottom: -60px;
             left: 50%;
             transform: translateX(-50%);
             color: #f4d03f;
-            font-size: 1.3rem;
+            font-size: 1.4rem;
             font-weight: bold;
-            text-shadow: 2px 2px 8px rgba(0,0,0,0.9);
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.9);
             white-space: nowrap;
             opacity: 0;
             transition: opacity 0.5s ease 0.5s;
@@ -209,21 +234,37 @@
             opacity: 1;
         }
         @keyframes float1 {
-            0%, 100% { transform: translate(-50%, -50%) scale(1) translate(-200px, -150px) rotate(0deg); }
-            50% { transform: translate(-50%, -50%) scale(1) translate(-200px, -180px) rotate(5deg); }
+            0%, 100% { transform: translate(-50%, -50%) scale(1) translate(-350px, -220px) rotate(0deg); }
+            50% { transform: translate(-50%, -50%) scale(1) translate(-350px, -260px) rotate(5deg); }
         }
         @keyframes float2 {
-            0%, 100% { transform: translate(-50%, -50%) scale(1) translate(200px, -120px) rotate(0deg); }
-            50% { transform: translate(-50%, -50%) scale(1) translate(200px, -150px) rotate(-5deg); }
+            0%, 100% { transform: translate(-50%, -50%) scale(1) translate(350px, -200px) rotate(0deg); }
+            50% { transform: translate(-50%, -50%) scale(1) translate(350px, -240px) rotate(-5deg); }
         }
         @keyframes float3 {
-            0%, 100% { transform: translate(-50%, -50%) scale(1) translate(-180px, 180px) rotate(0deg); }
-            50% { transform: translate(-50%, -50%) scale(1) translate(-180px, 160px) rotate(3deg); }
+            0%, 100% { transform: translate(-50%, -50%) scale(1) translate(-380px, 180px) rotate(0deg); }
+            50% { transform: translate(-50%, -50%) scale(1) translate(-380px, 160px) rotate(3deg); }
         }
         @keyframes float4 {
-            0%, 100% { transform: translate(-50%, -50%) scale(1) translate(200px, 150px) rotate(0deg); }
-            33% { transform: translate(-50%, -50%) scale(1) translate(200px, 140px) rotate(-2deg); }
-            66% { transform: translate(-50%, -50%) scale(1) translate(200px, 130px) rotate(2deg); }
+            0%, 100% { transform: translate(-50%, -50%) scale(1) translate(320px, 220px) rotate(0deg); }
+            33% { transform: translate(-50%, -50%) scale(1) translate(320px, 200px) rotate(-2deg); }
+            66% { transform: translate(-50%, -50%) scale(1) translate(320px, 190px) rotate(2deg); }
+        }
+        @keyframes float5 {
+            0%, 100% { transform: translate(-50%, -50%) scale(1) translate(-200px, -350px) rotate(0deg); }
+            50% { transform: translate(-50%, -50%) scale(1) translate(-200px, -380px) rotate(4deg); }
+        }
+        @keyframes float6 {
+            0%, 100% { transform: translate(-50%, -50%) scale(1) translate(250px, -320px) rotate(0deg); }
+            50% { transform: translate(-50%, -50%) scale(1) translate(250px, -360px) rotate(-4deg); }
+        }
+        @keyframes float7 {
+            0%, 100% { transform: translate(-50%, -50%) scale(1) translate(-350px, 50px) rotate(0deg); }
+            50% { transform: translate(-50%, -50%) scale(1) translate(-350px, 30px) rotate(3deg); }
+        }
+        @keyframes float8 {
+            0%, 100% { transform: translate(-50%, -50%) scale(1) translate(380px, 80px) rotate(0deg); }
+            50% { transform: translate(-50%, -50%) scale(1) translate(380px, 60px) rotate(-3deg); }
         }
         .modal {
             position: fixed;
@@ -231,7 +272,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.85);
+            background: rgba(0, 0, 0, 0.9);
             display: none;
             justify-content: center;
             align-items: center;
@@ -298,6 +339,7 @@
             font-size: 0.9rem;
             text-align: center;
             z-index: 5;
+            transition: opacity 0.5s ease;
         }
     </style>
 </head>
@@ -325,21 +367,37 @@
     </header>
 
     <div class="planets-container">
-        <div class="planet planet-asteroide" id="asteroide" data-name="L'Asteroide B-612" data-desc="E' il piccolo pianeta da cui proviene il Piccolo Principe. E' grande appena come una casa, con tre vulcani (due attivi e uno spento), una rosa e il rischio costante dei baobab. Ogni giorno il Piccolo Principe poteva vedere 43 tramonti.">
+        <div class="planet planet-asteroide" id="asteroide">
             <img src="121985_4-fotor-bg-remover-2026070817346.png" alt="Asteroide">
             <span class="planet-name">L'Asteroide B-612</span>
         </div>
-        <div class="planet planet-baobab" id="baobab" data-name="Il Pianeta dei Baobab" data-desc="Un pianeta infestato dai baobab, alberi enormi che possono distruggere un piccolo pianeta se non vengono estirpati in tempo. Il Piccolo Principe impara l'importanza della disciplina e del lavoro quotidiano per evitare catastrofi.">
+        <div class="planet planet-re" id="re">
+            <img src="121985_4-fotor-bg-remover-2026070817346.png" alt="Re">
+            <span class="planet-name">Il Pianeta del Re</span>
+        </div>
+        <div class="planet planet-vanitoso" id="vanitoso">
+            <img src="121985_4-fotor-bg-remover-2026070817346.png" alt="Vanitoso">
+            <span class="planet-name">Il Pianeta del Vanitoso</span>
+        </div>
+        <div class="planet planet-uomo" id="uomo">
+            <img src="121985_4-fotor-bg-remover-2026070817346.png" alt="Uomo d'affari">
+            <span class="planet-name">Il Pianeta dell'Uomo d'Affari</span>
+        </div>
+        <div class="planet planet-lampione" id="lampione">
+            <img src="121985_4-fotor-bg-remover-2026070817346.png" alt="Lampione">
+            <span class="planet-name">Il Pianeta del Lampione</span>
+        </div>
+        <div class="planet planet-geografo" id="geografo">
+            <img src="121985_4-fotor-bg-remover-2026070817346.png" alt="Geografo">
+            <span class="planet-name">Il Pianeta del Geografo</span>
+        </div>
+        <div class="planet planet-baobab" id="baobab">
             <img src="121985_4-fotor-bg-remover-2026070817346.png" alt="Baobab">
             <span class="planet-name">Il Pianeta dei Baobab</span>
         </div>
-        <div class="planet planet-pecora" id="pecora" data-name="Il Pianeta della Pecora" data-desc="Un piccolo pianeta dove vive una pecora che il Piccolo Principe chiede al pilota di disegnare. La pecora vive in una scatola e rappresenta l'immaginazione e l'amicizia che nasce tra il bambino e l'aviatore nel deserto.">
-            <img src="121985_4-fotor-bg-remover-2026070817346.png" alt="Pecora">
-            <span class="planet-name">Il Pianeta della Pecora</span>
-        </div>
-        <div class="planet planet-lampione" id="lampione" data-name="Il Pianeta del Lampione" data-desc="Il primo pianeta visitato dal Piccolo Principe. E' abitato da un lampionaio che accende e spegne il lampione ogni minuto, perche' il pianeta gira cosi velocemente che il giorno dura solo un minuto. Rappresenta la dedizione al proprio dovere.">
-            <img src="121985_4-fotor-bg-remover-2026070817346.png" alt="Lampione">
-            <span class="planet-name">Il Pianeta del Lampione</span>
+        <div class="planet planet-rosa" id="rosa">
+            <img src="121985_4-fotor-bg-remover-2026070817346.png" alt="Rosa">
+            <span class="planet-name">Il Pianeta della Rosa</span>
         </div>
     </div>
 
@@ -352,7 +410,7 @@
         </div>
     </div>
 
-    <div class="instructions">
+    <div class="instructions" id="instructions">
         L'amministratore puo controllare i pianeti dalla pagina Webcam - Clicca su un pianeta per scoprirlo
     </div>
 
@@ -376,23 +434,40 @@
         const modalDesc = document.getElementById('modal-desc');
         const modalImg = document.getElementById('modal-img');
         const modalClose = document.getElementById('modal-close');
+        const instructions = document.getElementById('instructions');
 
         const planetDescriptions = {
             asteroide: {
                 name: "L'Asteroide B-612",
                 desc: "E' il piccolo pianeta da cui proviene il Piccolo Principe. E' grande appena come una casa, con tre vulcani (due attivi e uno spento), una rosa e il rischio costante dei baobab. Ogni giorno il Piccolo Principe poteva vedere 43 tramonti."
             },
-            baobab: {
-                name: "Il Pianeta dei Baobab",
-                desc: "Un pianeta infestato dai baobab, alberi enormi che possono distruggere un piccolo pianeta se non vengono estirpati in tempo. Il Piccolo Principe impara l'importanza della disciplina e del lavoro quotidiano per evitare catastrofi."
+            re: {
+                name: "Il Pianeta del Re",
+                desc: "Il primo pianeta visitato dal Piccolo Principe. E' abitato da un re senza sudditi che comanda le stelle, ma solo perche' sa che gli ubbidiranno. Rappresenta il desiderio di autorita' senza responsabilita'."
             },
-            pecora: {
-                name: "Il Pianeta della Pecora",
-                desc: "Un piccolo pianeta dove vive una pecora che il Piccolo Principe chiede al pilota di disegnare. La pecora vive in una scatola e rappresenta l'immaginazione e l'amicizia che nasce tra il bambino e l'aviatore nel deserto."
+            vanitoso: {
+                name: "Il Pianeta del Vanitoso",
+                desc: "Un pianeta abitato da un uomo che vuole solo essere ammirato. Indossa un cappello ridicolo per salutare, ma non c'e' nessuno che lo guardi. Rappresenta la vanita' e il bisogno di approvazione."
+            },
+            uomo: {
+                name: "Il Pianeta dell'Uomo d'Affari",
+                desc: "Un pianeta dove vive un uomo che conta le stelle per possederle. Non ha tempo per sognare o godersi la vita. Rappresenta l'avidita' e la follia del possesso materiale."
             },
             lampione: {
                 name: "Il Pianeta del Lampione",
-                desc: "Il primo pianeta visitato dal Piccolo Principe. E' abitato da un lampionaio che accende e spegne il lampione ogni minuto, perche' il pianeta gira cosi velocemente che il giorno dura solo un minuto. Rappresenta la dedizione al proprio dovere."
+                desc: "Il piu' strano di tutti i pianeti. E' abitato da un lampionaio che accende e spegne il lampione ogni minuto, perche' il pianeta gira cosi velocemente che il giorno dura solo un minuto. Rappresenta la dedizione al proprio dovere."
+            },
+            geografo: {
+                name: "Il Pianeta del Geografo",
+                desc: "Il pianeta piu' grande di tutti, abitato da un vecchio geografo che scrive libri ma non esplora mai. Dice che il Piccolo Principe dovrebbe visitare la Terra. Rappresenta la differenza tra sapere e vivere."
+            },
+            baobab: {
+                name: "Il Pianeta dei Baobab",
+                desc: "Un pianeta dove il Piccolo Principe impara l'importanza della disciplina. I baobab, se non estirpati in tempo, possono distruggere un piccolo pianeta. Rappresenta il lavoro quotidiano per prevenire le catastrofi."
+            },
+            rosa: {
+                name: "Il Pianeta della Rosa",
+                desc: "Non e' un vero pianeta, ma il ricordo della rosa che il Piccolo Principe ha lasciato sul suo asteroide. La rosa, con le sue spine e la sua vanita', rappresenta l'amore unico e irripetibile."
             }
         };
 
@@ -439,14 +514,17 @@
         socket.on('planet-deactivate-all', () => {
             document.querySelectorAll('.planet').forEach(p => p.classList.remove('active'));
             skyBg.classList.remove('dimmed');
+            instructions.style.opacity = '1';
         });
 
         function checkDimBackground() {
             const anyActive = document.querySelector('.planet.active');
             if (anyActive) {
                 skyBg.classList.add('dimmed');
+                instructions.style.opacity = '0';
             } else {
                 skyBg.classList.remove('dimmed');
+                instructions.style.opacity = '1';
             }
         }
     </script>
