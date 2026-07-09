@@ -75,6 +75,75 @@
             color: #f4d03f;
             background: rgba(244, 208, 63, 0.1);
         }
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 10px;
+            position: absolute;
+            right: 20px;
+        }
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: #f4d03f;
+            border-radius: 3px;
+            transition: all 0.3s;
+        }
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -6px);
+        }
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            top: 70px;
+            left: 0;
+            right: 0;
+            background: rgba(13, 17, 23, 0.98);
+            padding: 20px;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 999;
+            border-bottom: 1px solid rgba(232, 213, 183, 0.1);
+        }
+        .mobile-menu.active {
+            display: flex;
+        }
+        .mobile-menu a {
+            color: #e8d5b7;
+            text-decoration: none;
+            font-size: 1.1rem;
+            padding: 15px 20px;
+            border-radius: 10px;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        .mobile-menu a:hover, .mobile-menu a.active {
+            color: #f4d03f;
+            background: rgba(244, 208, 63, 0.1);
+        }
+        @media (max-width: 768px) {
+            nav {
+                padding: 15px 20px;
+                justify-content: flex-start;
+            }
+            nav .logo {
+                position: static;
+            }
+            nav .nav-links, nav .nav-right {
+                display: none;
+            }
+            .hamburger {
+                display: flex;
+            }
+        }
         header {
             text-align: center;
             padding: 100px 20px 70px;
@@ -268,7 +337,21 @@
         <div class="nav-right">
             <a href="login.html">Login</a>
         </div>
+        <div class="hamburger" id="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
     </nav>
+    
+    <div class="mobile-menu" id="mobile-menu">
+        <a href="index.html">Home</a>
+        <a href="pilots.html">Sensori</a>
+        <a href="webcam.html">Webcam</a>
+        <a href="pianeti.html">Pianeti</a>
+        <a href="chi-siamo.html">Chi siamo</a>
+        <a href="login.html">Login</a>
+    </div>
     
     <header>
         <h1>Il Piccolo Principe</h1>
@@ -333,6 +416,21 @@
             star.style.animationDelay = Math.random() * 2 + 's';
             starsContainer.appendChild(star);
         }
+        
+        const hamburger = document.getElementById('hamburger');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('active');
+            mobileMenu.classList.toggle('active');
+        });
+        
+        document.addEventListener('click', (e) => {
+            if (!hamburger.contains(e.target) && !mobileMenu.contains(e.target)) {
+                hamburger.classList.remove('active');
+                mobileMenu.classList.remove('active');
+            }
+        });
     </script>
 </body>
 </html>
