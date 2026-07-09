@@ -369,6 +369,43 @@
             color: #bb8fce;
             font-size: 0.9rem;
         }
+        @media (max-width: 768px) {
+            nav {
+                padding: 12px 15px;
+            }
+            nav .logo {
+                font-size: 1rem;
+                left: 15px;
+            }
+            nav .nav-links {
+                gap: 8px;
+            }
+            nav .nav-links a {
+                font-size: 0.8rem;
+                padding: 6px 10px;
+            }
+            nav .nav-right {
+                right: 15px;
+            }
+            nav .nav-right a {
+                font-size: 0.8rem;
+                padding: 6px 10px;
+            }
+            header h1 {
+                font-size: 2rem;
+            }
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            .like-buttons {
+                flex-direction: column;
+            }
+            .planet-btn {
+                font-size: 0.85rem !important;
+                padding: 8px 12px !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -428,7 +465,6 @@
                     <button class="btn planet-btn" id="btn-lampione" data-planet="lampione" style="border-color: #ffd700; color: #ffd700;">Pianeta Lampione</button>
                     <button class="btn planet-btn" id="btn-geografo" data-planet="geografo" style="border-color: #4682b4; color: #4682b4;">Pianeta Geografo</button>
                     <button class="btn planet-btn" id="btn-baobab" data-planet="baobab" style="border-color: #4a7c4e; color: #4a7c4e;">Pianeta Baobab</button>
-                    <button class="btn planet-btn" id="btn-rosa" data-planet="rosa" style="border-color: #ff1493; color: #ff1493;">Pianeta Rosa</button>
                 </div>
                 <div style="text-align: center; margin-top: 15px;">
                     <button class="btn stop" id="btn-reset-planets">Resetta Tutti</button>

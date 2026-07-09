@@ -161,6 +161,19 @@
         .planet-asteroide img {
             filter: sepia(0.3) saturate(1.5) hue-rotate(-10deg) drop-shadow(0 0 80px rgba(244, 164, 96, 0.8));
         }
+        .rose-on-asteroid {
+            position: absolute;
+            top: 35%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 4rem;
+            filter: drop-shadow(0 0 20px rgba(255, 20, 147, 0.8));
+            animation: sway 3s ease-in-out infinite;
+        }
+        @keyframes sway {
+            0%, 100% { transform: translateX(-50%) rotate(-5deg); }
+            50% { transform: translateX(-50%) rotate(5deg); }
+        }
         .planet-re { width: 420px; }
         .planet-re.active {
             transform: translate(-50%, -50%) scale(1) translate(350px, -200px);
@@ -212,14 +225,6 @@
         .planet-baobab img {
             filter: sepia(0.3) saturate(2) hue-rotate(90deg) brightness(1.1) drop-shadow(0 0 80px rgba(74, 124, 78, 0.8));
         }
-        .planet-rosa { width: 320px; }
-        .planet-rosa.active {
-            transform: translate(-50%, -50%) scale(1) translate(380px, 80px);
-            animation: float8 5s ease-in-out infinite;
-        }
-        .planet-rosa img {
-            filter: sepia(0.2) saturate(2.5) hue-rotate(290deg) brightness(1.2) drop-shadow(0 0 80px rgba(255, 20, 147, 0.8));
-        }
         .planet-name {
             position: absolute;
             bottom: -60px;
@@ -264,10 +269,6 @@
         @keyframes float7 {
             0%, 100% { transform: translate(-50%, -50%) scale(1) translate(-350px, 50px) rotate(0deg); }
             50% { transform: translate(-50%, -50%) scale(1) translate(-350px, 30px) rotate(3deg); }
-        }
-        @keyframes float8 {
-            0%, 100% { transform: translate(-50%, -50%) scale(1) translate(380px, 80px) rotate(0deg); }
-            50% { transform: translate(-50%, -50%) scale(1) translate(380px, 60px) rotate(-3deg); }
         }
         .modal {
             position: fixed;
@@ -344,6 +345,82 @@
             z-index: 5;
             transition: opacity 0.5s ease;
         }
+        @media (max-width: 768px) {
+            nav {
+                padding: 12px 15px;
+            }
+            nav .logo {
+                font-size: 1rem;
+                left: 15px;
+            }
+            nav .nav-links {
+                gap: 8px;
+            }
+            nav .nav-links a {
+                font-size: 0.8rem;
+                padding: 6px 10px;
+            }
+            nav .nav-right {
+                right: 15px;
+            }
+            nav .nav-right a {
+                font-size: 0.8rem;
+                padding: 6px 10px;
+            }
+            header {
+                padding: 80px 15px 30px;
+            }
+            header h1 {
+                font-size: 2rem;
+            }
+            header p {
+                font-size: 1rem;
+            }
+            .planet {
+                width: 60% !important;
+            }
+            .planet-asteroide.active {
+                transform: translate(-50%, -50%) scale(1) translate(0, -100px);
+            }
+            .planet-re.active {
+                transform: translate(-50%, -50%) scale(1) translate(0, 100px);
+            }
+            .planet-vanitoso.active {
+                transform: translate(-50%, -50%) scale(1) translate(-80px, 0);
+            }
+            .planet-uomo.active {
+                transform: translate(-50%, -50%) scale(1) translate(80px, 0);
+            }
+            .planet-lampione.active {
+                transform: translate(-50%, -50%) scale(1) translate(-60px, -80px);
+            }
+            .planet-geografo.active {
+                transform: translate(-50%, -50%) scale(1) translate(60px, -80px);
+            }
+            .planet-baobab.active {
+                transform: translate(-50%, -50%) scale(1) translate(0, 80px);
+            }
+            .planet-name {
+                font-size: 1rem;
+                bottom: -40px;
+            }
+            .rose-on-asteroid {
+                font-size: 2.5rem;
+            }
+            .modal-content {
+                padding: 30px;
+                margin: 20px;
+            }
+            .modal h2 {
+                font-size: 1.5rem;
+            }
+            .modal p {
+                font-size: 0.95rem;
+            }
+            .modal-planet-img {
+                width: 100px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -372,6 +449,7 @@
     <div class="planets-container">
         <div class="planet planet-asteroide" id="asteroide">
             <img src="121985_4-fotor-bg-remover-2026070817346.png" alt="Asteroide">
+            <div class="rose-on-asteroid">🌹</div>
             <span class="planet-name">L'Asteroide B-612</span>
         </div>
         <div class="planet planet-re" id="re">
@@ -397,10 +475,6 @@
         <div class="planet planet-baobab" id="baobab">
             <img src="IL-PICCOLO-PRINCIPE-ALBERI.jpg" alt="Baobab">
             <span class="planet-name">Il Pianeta dei Baobab</span>
-        </div>
-        <div class="planet planet-rosa" id="rosa">
-            <img src="il-piccolo-principe-elefanti.jpg" alt="Rosa">
-            <span class="planet-name">Il Pianeta della Rosa</span>
         </div>
     </div>
 
@@ -442,7 +516,7 @@
         const planetDescriptions = {
             asteroide: {
                 name: "L'Asteroide B-612",
-                desc: "E' il piccolo pianeta da cui proviene il Piccolo Principe. E' grande appena come una casa, con tre vulcani (due attivi e uno spento), una rosa e il rischio costante dei baobab. Ogni giorno il Piccolo Principe poteva vedere 43 tramonti."
+                desc: "E' il piccolo pianeta da cui proviene il Piccolo Principe. E' grande appena come una casa, con tre vulcani (due attivi e uno spento), una rosa unica e il rischio costante dei baobab. La rosa, vanitosa ma amata, rappresenta l'amore unico. Ogni giorno il Piccolo Principe poteva vedere 43 tramonti."
             },
             re: {
                 name: "Il Pianeta del Re",
@@ -467,10 +541,6 @@
             baobab: {
                 name: "Il Pianeta dei Baobab",
                 desc: "Un pianeta dove il Piccolo Principe impara l'importanza della disciplina. I baobab, se non estirpati in tempo, possono distruggere un piccolo pianeta. Rappresenta il lavoro quotidiano per prevenire le catastrofi."
-            },
-            rosa: {
-                name: "Il Pianeta della Rosa",
-                desc: "Non e' un vero pianeta, ma il ricordo della rosa che il Piccolo Principe ha lasciato sul suo asteroide. La rosa, con le sue spine e la sua vanita', rappresenta l'amore unico e irripetibile."
             }
         };
 
