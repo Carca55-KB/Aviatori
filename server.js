@@ -106,6 +106,18 @@ io.on('connection', (socket) => {
         }
     });
     
+    socket.on('planet-activate', (data) => {
+        io.emit('planet-activate', data);
+    });
+    
+    socket.on('planet-deactivate', (data) => {
+        io.emit('planet-deactivate', data);
+    });
+    
+    socket.on('planet-deactivate-all', () => {
+        io.emit('planet-deactivate-all');
+    });
+    
     socket.on('disconnect', () => {
         if (socket.isAdmin) {
             adminSocket = null;

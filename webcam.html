@@ -352,8 +352,9 @@
         <div class="logo">Il Piccolo Principe</div>
         <div class="nav-links">
             <a href="index.html">Home</a>
-            <a href="pilots.html">I sensi della volpe</a>
+            <a href="pilots.html">Sensori</a>
             <a href="webcam.html" class="active">Webcam</a>
+            <a href="pianeti.html">Pianeti</a>
             <a href="chi-siamo.html">Chi siamo</a>
             <span id="auth-nav"></span>
         </div>
@@ -388,6 +389,20 @@
             </div>
             
             <div class="status" id="status">Clicca "Avvia Trasmissione" per iniziare</div>
+            
+            <div class="planets-control" style="margin-top: 40px; padding: 30px; background: rgba(255,255,255,0.05); border-radius: 20px; border: 2px solid rgba(187, 143, 206, 0.3);">
+                <h3 style="color: #f4d03f; margin-bottom: 20px; text-align: center;">Controllo Pianeti</h3>
+                <p style="color: #bb8fce; text-align: center; margin-bottom: 20px; font-size: 0.9rem;">Attiva i pianeti sulla pagina Pianeti</p>
+                <div style="display: flex; flex-wrap: wrap; gap: 15px; justify-content: center;">
+                    <button class="btn planet-btn" id="btn-asteroide" data-planet="asteroide" style="border-color: #cd853f; color: #cd853f;">Asteroide B-612</button>
+                    <button class="btn planet-btn" id="btn-baobab" data-planet="baobab" style="border-color: #4a7c4e; color: #4a7c4e;">Pianeta Baobab</button>
+                    <button class="btn planet-btn" id="btn-pecora" data-planet="pecora" style="border-color: #c0c0c0; color: #c0c0c0;">Pianeta Pecora</button>
+                    <button class="btn planet-btn" id="btn-lampione" data-planet="lampione" style="border-color: #ffd700; color: #ffd700;">Pianeta Lampione</button>
+                </div>
+                <div style="text-align: center; margin-top: 15px;">
+                    <button class="btn stop" id="btn-reset-planets">Resetta Tutti</button>
+                </div>
+            </div>
         </div>
         
         <div id="viewer-panel" style="display: none;">
@@ -871,6 +886,33 @@
         
         startBtn.addEventListener('click', startWebcam);
         stopBtn.addEventListener('click', stopWebcam);
+        
+        document.querySelectorAll('.planet-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const planet = btn.dataset.planet;
+                const isActive = btn.classList.contains('active');
+                
+                if (isActive) {
+                    btn.classList.remove('active');
+                    btn.style.background = 'transparent';
+                    socket.emit('planet-deactivate', { planet });
+                } else {
+                    btn.classList.add('active');
+                    btn.style.background = btn.style.borderColor;
+                    btn.style.color = '#1a1a2e';
+                    socket.emit('planet-activate', { planet });
+                }
+            });
+        });
+        
+        document.getElementById('btn-reset-planets').addEventListener('click', () => {
+            document.querySelectorAll('.planet-btn').forEach(btn => {
+                btn.classList.remove('active');
+                btn.style.background = 'transparent';
+                btn.style.color = btn.style.borderColor;
+            });
+            socket.emit('planet-deactivate-all');
+        });
         
         checkAuth();
     </script>
