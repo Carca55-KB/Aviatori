@@ -17,6 +17,7 @@
             min-height: 100vh;
             overflow: hidden;
             position: relative;
+            background: #0d1117;
         }
         .sky-bg {
             position: fixed;
@@ -24,21 +25,14 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: url('Starry-Sky-scaled-1-1536x1024.jpg') center center / cover no-repeat;
+            background: #0d1117;
             z-index: -2;
-            transition: all 1s ease;
         }
         .sky-bg.dimmed {
-            filter: brightness(0.15);
+            opacity: 0.3;
         }
         .stars {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: -1;
+            display: none;
         }
         .star {
             position: absolute;
@@ -55,13 +49,13 @@
             top: 0;
             left: 0;
             right: 0;
-            background: rgba(0,0,0,0.4);
-            backdrop-filter: blur(10px);
-            padding: 15px 40px;
+            background: rgba(13, 17, 23, 0.95);
+            padding: 18px 40px;
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 1000;
+            border-bottom: 1px solid rgba(232, 213, 183, 0.1);
         }
         nav .logo {
             color: #f4d03f;
