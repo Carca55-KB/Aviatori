@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>I Pianeti - Il Piccolo Principe</title>
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
-    <script src="/socket.io/socket.io.js"></script>
     <style>
         * {
             margin: 0;
@@ -14,25 +13,19 @@
         }
         body {
             font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #0b0b0c 0%, #1a0505 50%, #0b0b0c 100%);
             min-height: 100vh;
-            overflow: hidden;
-            position: relative;
-            background: #0d1117;
+            color: #e8d5b7;
+            padding-top: 70px;
         }
-        .sky-bg {
+        .stars {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: #0d1117;
-            z-index: -2;
-        }
-        .sky-bg.dimmed {
-            opacity: 0.3;
-        }
-        .stars {
-            display: none;
+            pointer-events: none;
+            z-index: 0;
         }
         .star {
             position: absolute;
@@ -172,319 +165,200 @@
         }
         header {
             text-align: center;
-            padding: 100px 20px 40px;
+            padding: 40px 20px 20px;
             position: relative;
             z-index: 1;
-            transition: opacity 0.5s ease;
         }
         header h1 {
-            font-size: 3rem;
+            font-size: 2.5rem;
             color: #f4d03f;
-            text-shadow: 2px 2px 10px rgba(0,0,0,0.8);
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
         header p {
             font-style: italic;
-            font-size: 1.2rem;
             color: #bb8fce;
-            text-shadow: 1px 1px 5px rgba(0,0,0,0.8);
         }
-        .planets-container {
-            position: fixed;
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        .journey-graph {
+            position: relative;
+            width: 100%;
+            height: 600px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            border: 1px solid rgba(244, 208, 63, 0.2);
+            overflow: hidden;
+        }
+        .journey-line {
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             pointer-events: none;
-            z-index: 10;
         }
-        .planet {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0);
-            opacity: 0;
-            pointer-events: auto;
-            cursor: pointer;
-            transition: all 1.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        .planet img {
+        .journey-line svg {
             width: 100%;
-            height: auto;
-            filter: drop-shadow(0 0 60px rgba(255, 255, 255, 0.5));
+            height: 100%;
         }
-        .planet.active {
-            opacity: 1;
+        .journey-line path {
+            stroke: rgba(244, 208, 63, 0.4);
+            stroke-width: 2;
+            fill: none;
+            stroke-dasharray: 8, 4;
+            animation: dash 20s linear infinite;
         }
-        .planet-asteroide { width: 420px; }
-        .planet-asteroide.active {
-            transform: translate(-50%, -50%) scale(1) translate(-200px, -100px);
-            animation: float1 6s ease-in-out infinite;
+        @keyframes dash {
+            to { stroke-dashoffset: -1000; }
         }
-        .planet-asteroide img {
-            filter: drop-shadow(0 0 80px rgba(244, 164, 96, 0.8));
-        }
-        .rose-on-asteroid {
+        .planet-node {
             position: absolute;
-            top: 35%;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 4rem;
-            filter: drop-shadow(0 0 20px rgba(255, 20, 147, 0.8));
-            animation: sway 3s ease-in-out infinite;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+            text-align: center;
         }
-        @keyframes sway {
-            0%, 100% { transform: translateX(-50%) rotate(-5deg); }
-            50% { transform: translateX(-50%) rotate(5deg); }
+        .planet-node:hover {
+            transform: scale(1.15);
         }
-        .planet-re { width: 390px; }
-        .planet-re.active {
-            transform: translate(-50%, -50%) scale(1) translate(200px, -100px);
-            animation: float2 7s ease-in-out infinite;
+        .planet-node img {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            border: 3px solid rgba(244, 208, 63, 0.5);
+            filter: drop-shadow(0 0 15px rgba(244, 208, 63, 0.5));
+            transition: all 0.3s ease;
+            background: rgba(0,0,0,0.3);
         }
-        .planet-re img {
-            filter: drop-shadow(0 0 80px rgba(155, 89, 182, 0.8));
+        .planet-node:hover img {
+            border-color: #f4d03f;
+            filter: drop-shadow(0 0 25px rgba(244, 208, 63, 0.8));
         }
-        .planet-vanitoso { width: 380px; }
-        .planet-vanitoso.active {
-            transform: translate(-50%, -50%) scale(1) translate(-250px, 120px);
-            animation: float3 5s ease-in-out infinite;
-        }
-        .planet-vanitoso img {
-            filter: drop-shadow(0 0 80px rgba(233, 30, 99, 0.8));
-        }
-        .planet-uomo { width: 370px; }
-        .planet-uomo.active {
-            transform: translate(-50%, -50%) scale(1) translate(250px, 130px);
-            animation: float4 8s ease-in-out infinite;
-        }
-        .planet-uomo img {
-            filter: drop-shadow(0 0 80px rgba(243, 156, 18, 0.8));
-        }
-        .planet-lampione { width: 350px; }
-        .planet-lampione.active {
-            transform: translate(-50%, -50%) scale(1) translate(-100px, -250px);
-            animation: float5 6s ease-in-out infinite;
-        }
-        .planet-lampione img {
-            filter: brightness(1.2) drop-shadow(0 0 100px rgba(255, 215, 0, 1));
-        }
-        .planet-geografo { width: 400px; }
-        .planet-geografo.active {
-            transform: translate(-50%, -50%) scale(1) translate(100px, -250px);
-            animation: float6 7s ease-in-out infinite;
-        }
-        .planet-geografo img {
-            filter: drop-shadow(0 0 80px rgba(52, 152, 219, 0.8));
-        }
-        .planet-terra { width: 450px; }
-        .planet-terra.active {
-            transform: translate(-50%, -50%) scale(1) translate(0px, 150px);
-            animation: float7 9s ease-in-out infinite;
-        }
-        .planet-terra img {
-            filter: drop-shadow(0 0 100px rgba(39, 174, 96, 0.8));
-        }
-        .planet-name {
+        .planet-node .node-number {
             position: absolute;
-            bottom: -60px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: #f4d03f;
-            font-size: 1.4rem;
+            top: -8px;
+            right: -8px;
+            background: #f4d03f;
+            color: #1a1a2e;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-weight: bold;
-            text-shadow: 2px 2px 10px rgba(0,0,0,0.9);
-            white-space: nowrap;
-            opacity: 0;
-            transition: opacity 0.5s ease 0.5s;
+            font-size: 0.85rem;
+            box-shadow: 0 2px 10px rgba(244, 208, 63, 0.5);
         }
-        .planet.active .planet-name {
-            opacity: 1;
+        .planet-node .node-name {
+            margin-top: 10px;
+            color: #e8d5b7;
+            font-size: 0.85rem;
+            max-width: 130px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+            line-height: 1.3;
         }
-        @keyframes float1 {
-            0%, 100% { transform: translate(-50%, -50%) scale(1) translate(-200px, -100px) rotate(0deg); }
-            50% { transform: translate(-50%, -50%) scale(1) translate(-200px, -130px) rotate(5deg); }
-        }
-        @keyframes float2 {
-            0%, 100% { transform: translate(-50%, -50%) scale(1) translate(200px, -100px) rotate(0deg); }
-            50% { transform: translate(-50%, -50%) scale(1) translate(200px, -130px) rotate(-5deg); }
-        }
-        @keyframes float3 {
-            0%, 100% { transform: translate(-50%, -50%) scale(1) translate(-250px, 120px) rotate(0deg); }
-            50% { transform: translate(-50%, -50%) scale(1) translate(-250px, 100px) rotate(3deg); }
-        }
-        @keyframes float4 {
-            0%, 100% { transform: translate(-50%, -50%) scale(1) translate(250px, 130px) rotate(0deg); }
-            33% { transform: translate(-50%, -50%) scale(1) translate(250px, 110px) rotate(-2deg); }
-            66% { transform: translate(-50%, -50%) scale(1) translate(250px, 100px) rotate(2deg); }
-        }
-        @keyframes float5 {
-            0%, 100% { transform: translate(-50%, -50%) scale(1) translate(-100px, -250px) rotate(0deg); }
-            50% { transform: translate(-50%, -50%) scale(1) translate(-100px, -280px) rotate(4deg); }
-        }
-        @keyframes float6 {
-            0%, 100% { transform: translate(-50%, -50%) scale(1) translate(100px, -250px) rotate(0deg); }
-            50% { transform: translate(-50%, -50%) scale(1) translate(100px, -280px) rotate(-4deg); }
-        }
-        @keyframes float7 {
-            0%, 100% { transform: translate(-50%, -50%) scale(1) translate(0px, 150px) rotate(0deg); }
-            50% { transform: translate(-50%, -50%) scale(1) translate(0px, 120px) rotate(3deg); }
-        }
-        .modal {
+        .planet-modal {
+            display: none;
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
+            right: 0;
+            bottom: 0;
             background: rgba(0, 0, 0, 0.9);
-            display: none;
+            z-index: 1000;
             justify-content: center;
             align-items: center;
-            z-index: 2000;
-            opacity: 0;
-            transition: opacity 0.4s ease;
         }
-        .modal.visible {
+        .planet-modal.active {
             display: flex;
-            opacity: 1;
         }
-        .modal-content {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-            border-radius: 25px;
-            padding: 50px;
-            max-width: 600px;
+        .planet-modal-content {
+            background: linear-gradient(135deg, rgba(26, 26, 46, 0.98) 0%, rgba(15, 52, 96, 0.98) 100%);
+            border: 2px solid rgba(244, 208, 63, 0.5);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
             text-align: center;
-            border: 2px solid rgba(244, 208, 63, 0.3);
-            box-shadow: 0 0 80px rgba(244, 208, 63, 0.2);
-            transform: scale(0.8);
-            transition: transform 0.4s ease;
+            position: relative;
+            animation: modalFadeIn 0.3s ease;
         }
-        .modal.visible .modal-content {
-            transform: scale(1);
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
         }
-        .modal-planet-img {
-            width: 150px;
-            height: auto;
-            margin-bottom: 25px;
-            filter: drop-shadow(0 0 30px rgba(255, 255, 255, 0.5));
+        .planet-modal-content img {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            margin-bottom: 20px;
+            border: 4px solid rgba(244, 208, 63, 0.5);
+            filter: drop-shadow(0 0 20px rgba(244, 208, 63, 0.5));
+            object-fit: cover;
         }
-        .modal h2 {
+        .planet-modal-content h2 {
             color: #f4d03f;
-            font-size: 2rem;
+            font-size: 1.6rem;
+            margin-bottom: 10px;
+        }
+        .planet-modal-content .planet-order {
+            color: #bb8fce;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+        .planet-modal-content p {
+            color: #e8d5b7;
+            font-size: 1rem;
+            line-height: 1.7;
             margin-bottom: 20px;
         }
-        .modal p {
-            color: #e8d5b7;
-            font-size: 1.1rem;
-            line-height: 1.8;
-            margin-bottom: 30px;
-        }
         .modal-close {
-            background: rgba(244, 208, 63, 0.2);
-            border: 2px solid #f4d03f;
-            color: #f4d03f;
-            padding: 12px 40px;
-            font-size: 1rem;
-            border-radius: 25px;
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: #e8d5b7;
+            font-size: 2rem;
             cursor: pointer;
-            transition: all 0.3s;
-            font-family: 'Georgia', serif;
+            transition: color 0.3s;
+            line-height: 1;
         }
         .modal-close:hover {
-            background: #f4d03f;
-            color: #1a1a2e;
+            color: #f4d03f;
         }
-        .instructions {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
+        .legend {
+            text-align: center;
+            padding: 20px;
             color: #888;
             font-size: 0.9rem;
-            text-align: center;
-            z-index: 5;
-            transition: opacity 0.5s ease;
         }
         @media (max-width: 768px) {
-            nav {
-                padding: 12px 15px;
+            .journey-graph {
+                height: 800px;
             }
-            nav .logo {
-                font-size: 1rem;
-                left: 15px;
+            .planet-node img {
+                width: 70px;
+                height: 70px;
             }
-            nav .nav-links {
-                gap: 8px;
+            .planet-node .node-number {
+                width: 24px;
+                height: 24px;
+                font-size: 0.75rem;
             }
-            nav .nav-links a {
-                font-size: 0.8rem;
-                padding: 6px 10px;
-            }
-            nav .nav-right {
-                right: 15px;
-            }
-            nav .nav-right a {
-                font-size: 0.8rem;
-                padding: 6px 10px;
-            }
-            header {
-                padding: 80px 15px 30px;
-            }
-            header h1 {
-                font-size: 2rem;
-            }
-            header p {
-                font-size: 1rem;
-            }
-            .planet {
-                width: 60% !important;
-            }
-            .planet-asteroide.active {
-                transform: translate(-50%, -50%) scale(1) translate(0, -100px);
-            }
-            .planet-re.active {
-                transform: translate(-50%, -50%) scale(1) translate(0, 100px);
-            }
-            .planet-vanitoso.active {
-                transform: translate(-50%, -50%) scale(1) translate(-80px, 0);
-            }
-            .planet-uomo.active {
-                transform: translate(-50%, -50%) scale(1) translate(80px, 0);
-            }
-            .planet-lampione.active {
-                transform: translate(-50%, -50%) scale(1) translate(-60px, -80px);
-            }
-            .planet-geografo.active {
-                transform: translate(-50%, -50%) scale(1) translate(60px, -80px);
-            }
-            .planet-terra.active {
-                transform: translate(-50%, -50%) scale(1) translate(0, 80px);
-            }
-            .planet-name {
-                font-size: 1rem;
-                bottom: -40px;
-            }
-            .rose-on-asteroid {
-                font-size: 2.5rem;
-            }
-            .modal-content {
-                padding: 30px;
-                margin: 20px;
-            }
-            .modal h2 {
-                font-size: 1.5rem;
-            }
-            .modal p {
-                font-size: 0.95rem;
-            }
-            .modal-planet-img {
-                width: 100px;
+            .planet-node .node-name {
+                font-size: 0.75rem;
             }
         }
     </style>
 </head>
 <body>
-    <div class="sky-bg" id="sky-bg"></div>
     <div class="stars" id="stars"></div>
     
     <nav>
@@ -520,52 +394,85 @@
         <p>"Conobbe dunque molti pianeti abitati da grandi persone"</p>
     </header>
 
-    <div class="planets-container">
-        <div class="planet planet-asteroide" id="asteroide">
-            <img src="121985_4-fotor-bg-remover-2026070817346.png" alt="Asteroide">
-            <div class="rose-on-asteroid">🌹</div>
-            <span class="planet-name">L'Asteroide B-612</span>
+    <div class="container">
+        <div class="journey-graph" id="journey-graph">
+            <div class="journey-line">
+                <svg id="connections-svg"></svg>
+            </div>
         </div>
-        <div class="planet planet-re" id="re">
-            <img src="1pp-fotor-bg-remover-2026070912856.png" alt="Re">
-            <span class="planet-name">Il Pianeta del Re</span>
-        </div>
-        <div class="planet planet-vanitoso" id="vanitoso">
-            <img src="vanitoso-removebg-preview-1.png" alt="Vanitoso">
-            <span class="planet-name">Il Pianeta del Vanitoso</span>
-        </div>
-        <div class="planet planet-uomo" id="uomo">
-            <img src="3pp-fotor-bg-remover-2026070912161.png" alt="Uomo d'affari">
-            <span class="planet-name">Il Pianeta dell'Uomo d'Affari</span>
-        </div>
-        <div class="planet planet-lampione" id="lampione">
-            <img src="images-fotor-bg-remover-2026070912134.png" alt="Lampione">
-            <span class="planet-name">Il Pianeta del Lampione</span>
-        </div>
-        <div class="planet planet-geografo" id="geografo">
-            <img src="il-pianeta-del-geografo-removebg-preview-1.png" alt="Geografo">
-            <span class="planet-name">Il Pianeta del Geografo</span>
-        </div>
-        <div class="planet planet-terra" id="terra">
-            <img src="earth-removebg-preview.png" alt="Terra">
-            <span class="planet-name">La Terra</span>
-        </div>
+        <p class="legend">Clicca su un pianeta per scoprirne la storia</p>
     </div>
 
-    <div class="modal" id="planet-modal">
-        <div class="modal-content">
-            <img class="modal-planet-img" id="modal-img" src="" alt="Pianeta">
+    <div class="planet-modal" id="planet-modal">
+        <div class="planet-modal-content">
+            <button class="modal-close" id="modal-close">&times;</button>
+            <img id="modal-img" src="" alt="Pianeta">
             <h2 id="modal-title"></h2>
+            <p class="planet-order" id="modal-order"></p>
             <p id="modal-desc"></p>
-            <button class="modal-close" id="modal-close">Chiudi</button>
         </div>
-    </div>
-
-    <div class="instructions" id="instructions">
-        L'amministratore puo controllare i pianeti dalla pagina Webcam - Clicca su un pianeta per scoprirlo
     </div>
 
     <script>
+        const planetsData = [
+            {
+                id: 'asteroide',
+                name: "L'Asteroide B-612",
+                img: '121985_4-fotor-bg-remover-2026070817346.png',
+                order: '1° pianeta - La partenza',
+                desc: "Il piccolo pianeta d\'origine del Piccolo Principe, grande appena come una casa. Qui vive con la sua rosa e i suoi vulcani, osservando 44 tramonti al giorno quando è triste.",
+                position: { x: 8, y: 50 }
+            },
+            {
+                id: 're',
+                name: "Il Pianeta del Re",
+                img: '1pp-fotor-bg-remover-2026070912856.png',
+                order: '2° pianeta',
+                desc: "Un re senza sudditi che desidera solo essere obbedito. Ritiene di possedere le stelle perché le conta per prime, ma non ne trae alcun vantaggio.",
+                position: { x: 22, y: 25 }
+            },
+            {
+                id: 'vanitoso',
+                name: "Il Pianeta del Vanitoso",
+                img: 'vanitoso-removebg-preview-1.png',
+                order: '3° pianeta',
+                desc: "Un uomo che vuole essere ammirato da tutti ma non conosce nessun altro. Vive solo per gli applausi e considera gli altri come ammiratori.",
+                position: { x: 38, y: 55 }
+            },
+            {
+                id: 'uomo',
+                name: "Il Pianeta dell'Uomo d'Affari",
+                img: '3pp-fotor-bg-remover-2026070912161.png',
+                order: '4° pianeta',
+                desc: "Un uomo troppo occupato a contare le stelle per possederle. Non ha tempo per le cose essenziali: l\'acqua, le stelle profumate, i fiori.",
+                position: { x: 52, y: 20 }
+            },
+            {
+                id: 'lampione',
+                name: "Il Pianeta del Lampione",
+                img: 'images-fotor-bg-remover-2026070912134.png',
+                order: '5° pianeta',
+                desc: "Un uomo che accende e spegne il lampione ogni minuto perché il pianeta gira sempre più veloce. Esegue il suo compito con fedeltà, senza lamentarsi.",
+                position: { x: 68, y: 55 }
+            },
+            {
+                id: 'geografo',
+                name: "Il Pianeta del Geografo",
+                img: 'il-pianeta-del-geografo-removebg-preview-1.png',
+                order: '6° pianeta',
+                desc: "Uno scienziato che scrive libri di geografia ma non esplora mai. Insegna al Piccolo Principe che la sua rosa è effimera, spingendolo a cercare la Terra.",
+                position: { x: 82, y: 30 }
+            },
+            {
+                id: 'terra',
+                name: "La Terra",
+                img: 'earth-282691_1280.png',
+                order: '7° pianeta - L\'arrivo',
+                desc: "Un pianeta con miliardi di persone, ma il Piccolo Principe si sente solo. Qui incontra la volpe, che gli insegna il segreto dell\'amicizia.",
+                position: { x: 88, y: 70 }
+            }
+        ];
+
         const starsContainer = document.getElementById('stars');
         for (let i = 0; i < 150; i++) {
             const star = document.createElement('div');
@@ -578,102 +485,82 @@
             starsContainer.appendChild(star);
         }
 
-        const socket = io();
-        const skyBg = document.getElementById('sky-bg');
+        const journeyGraph = document.getElementById('journey-graph');
+        const svg = document.getElementById('connections-svg');
         const modal = document.getElementById('planet-modal');
-        const modalTitle = document.getElementById('modal-title');
-        const modalDesc = document.getElementById('modal-desc');
         const modalImg = document.getElementById('modal-img');
+        const modalTitle = document.getElementById('modal-title');
+        const modalOrder = document.getElementById('modal-order');
+        const modalDesc = document.getElementById('modal-desc');
         const modalClose = document.getElementById('modal-close');
-        const instructions = document.getElementById('instructions');
 
-        const planetDescriptions = {
-            asteroide: {
-                name: "L'Asteroide B-612",
-                desc: "E' il piccolo pianeta da cui proviene il Piccolo Principe. E' grande appena come una casa, con tre vulcani (due attivi e uno spento), una rosa unica e il rischio costante dei baobab. La rosa, vanitosa ma amata, rappresenta l'amore unico. Ogni giorno il Piccolo Principe poteva vedere 43 tramonti."
-            },
-            re: {
-                name: "Il Pianeta del Re",
-                desc: "Il primo pianeta visitato dal Piccolo Principe. E' abitato da un re senza sudditi che comanda le stelle, ma solo perche' sa che gli ubbidiranno. Rappresenta il desiderio di autorita' senza responsabilita'."
-            },
-            vanitoso: {
-                name: "Il Pianeta del Vanitoso",
-                desc: "Un pianeta abitato da un uomo che vuole solo essere ammirato. Indossa un cappello ridicolo per salutare, ma non c'e' nessuno che lo guardi. Rappresenta la vanita' e il bisogno di approvazione."
-            },
-            uomo: {
-                name: "Il Pianeta dell'Uomo d'Affari",
-                desc: "Un pianeta dove vive un uomo che conta le stelle per possederle. Non ha tempo per sognare o godersi la vita. Rappresenta l'avidita' e la follia del possesso materiale."
-            },
-            lampione: {
-                name: "Il Pianeta del Lampione",
-                desc: "Il piu' strano di tutti i pianeti. E' abitato da un lampionaio che accende e spegne il lampione ogni minuto, perche' il pianeta gira cosi velocemente che il giorno dura solo un minuto. Rappresenta la dedizione al proprio dovere."
-            },
-            geografo: {
-                name: "Il Pianeta del Geografo",
-                desc: "Il pianeta piu' grande di tutti, abitato da un vecchio geografo che scrive libri ma non esplora mai. Dice che il Piccolo Principe dovrebbe visitare la Terra. Rappresenta la differenza tra sapere e vivere."
-            },
-            terra: {
-                name: "La Terra",
-                desc: "L'ultimo pianeta visitato dal Piccolo Principe. Qui incontra il pilota nel deserto del Sahara e la volpe che gli insegna il segreto dell'amicizia. La Terra, con i suoi miliardi di adulti, rappresenta il mondo reale dove il Piccolo Principe impara le verita' piu' importanti sulla vita e sull'amore."
-            }
-        };
+        function createPlanets() {
+            planetsData.forEach((planet, index) => {
+                const node = document.createElement('div');
+                node.className = 'planet-node';
+                node.style.left = planet.position.x + '%';
+                node.style.top = planet.position.y + '%';
+                node.style.transform = 'translate(-50%, -50%)';
+                
+                node.innerHTML = `
+                    <img src="${planet.img}" alt="${planet.name}">
+                    <span class="node-number">${index + 1}</span>
+                    <div class="node-name">${planet.name}</div>
+                `;
+                
+                node.addEventListener('click', () => openModal(planet));
+                journeyGraph.appendChild(node);
+            });
+        }
 
-        document.querySelectorAll('.planet').forEach(planet => {
-            planet.addEventListener('click', () => {
-                const id = planet.id;
-                const info = planetDescriptions[id];
-                if (info) {
-                    modalTitle.textContent = info.name;
-                    modalDesc.textContent = info.desc;
-                    modalImg.src = planet.querySelector('img').src;
-                    modal.classList.add('visible');
+        function drawConnections() {
+            const graphRect = journeyGraph.getBoundingClientRect();
+            svg.setAttribute('viewBox', `0 0 ${graphRect.width} ${graphRect.height}`);
+            
+            let pathD = '';
+            
+            planetsData.forEach((planet, index) => {
+                if (index < planetsData.length - 1) {
+                    const x1 = (planet.position.x / 100) * graphRect.width;
+                    const y1 = (planet.position.y / 100) * graphRect.height;
+                    const x2 = (planetsData[index + 1].position.x / 100) * graphRect.width;
+                    const y2 = (planetsData[index + 1].position.y / 100) * graphRect.height;
+                    
+                    const cx = (x1 + x2) / 2;
+                    const cy = (y1 + y2) / 2 - 30;
+                    
+                    if (index === 0) {
+                        pathD += `M ${x1} ${y1}`;
+                    }
+                    pathD += ` Q ${cx} ${cy} ${x2} ${y2}`;
                 }
             });
-        });
-
-        modalClose.addEventListener('click', () => {
-            modal.classList.remove('visible');
-        });
-
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                modal.classList.remove('visible');
-            }
-        });
-
-        socket.on('planet-activate', (data) => {
-            const planet = document.getElementById(data.planet);
-            if (planet) {
-                planet.classList.add('active');
-                checkDimBackground();
-            }
-        });
-
-        socket.on('planet-deactivate', (data) => {
-            const planet = document.getElementById(data.planet);
-            if (planet) {
-                planet.classList.remove('active');
-                checkDimBackground();
-            }
-        });
-
-        socket.on('planet-deactivate-all', () => {
-            document.querySelectorAll('.planet').forEach(p => p.classList.remove('active'));
-            skyBg.classList.remove('dimmed');
-            instructions.style.opacity = '1';
-        });
-
-        function checkDimBackground() {
-            const anyActive = document.querySelector('.planet.active');
-            if (anyActive) {
-                skyBg.classList.add('dimmed');
-                instructions.style.opacity = '0';
-            } else {
-                skyBg.classList.remove('dimmed');
-                instructions.style.opacity = '1';
-            }
+            
+            svg.innerHTML = `<path d="${pathD}"/>`;
         }
+
+        function openModal(planet) {
+            modalImg.src = planet.img;
+            modalTitle.textContent = planet.name;
+            modalOrder.textContent = planet.order;
+            modalDesc.textContent = planet.desc;
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            modal.classList.remove('active');
+        }
+
+        modalClose.addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+        });
+
+        createPlanets();
+        drawConnections();
         
+        window.addEventListener('resize', drawConnections);
+
         const hamburger = document.getElementById('hamburger');
         const mobileMenu = document.getElementById('mobile-menu');
         
