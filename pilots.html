@@ -43,7 +43,7 @@
             gap: 25px;
             justify-content: center;
         }
-        nav .nav-links a, nav .nav-links span {
+        nav .nav-links a {
             color: #e8d5b7;
             text-decoration: none;
             font-size: 0.95rem;
@@ -59,6 +59,23 @@
         nav .nav-links a.active {
             color: #f4d03f;
             background: rgba(244, 208, 63, 0.15);
+        }
+        nav .nav-right {
+            position: absolute;
+            right: 40px;
+        }
+        nav .nav-right a, nav .nav-right span {
+            color: #e8d5b7;
+            text-decoration: none;
+            font-size: 0.95rem;
+            padding: 8px 16px;
+            border-radius: 20px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        nav .nav-right a:hover {
+            color: #f4d03f;
+            background: rgba(244, 208, 63, 0.1);
         }
         header {
             text-align: center;
@@ -213,6 +230,8 @@
             <a href="webcam.html">Webcam</a>
             <a href="pianeti.html">Pianeti</a>
             <a href="chi-siamo.html">Chi siamo</a>
+        </div>
+        <div class="nav-right">
             <span id="auth-nav"></span>
         </div>
     </nav>
