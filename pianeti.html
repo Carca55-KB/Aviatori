@@ -73,6 +73,7 @@
         nav .nav-links {
             display: flex;
             gap: 25px;
+            justify-content: center;
         }
         nav .nav-links a {
             color: #e8d5b7;
@@ -117,15 +118,13 @@
             position: absolute;
             border-radius: 50%;
             opacity: 0;
-            transform: scale(0);
-            transition: all 1.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-            cursor: pointer;
             pointer-events: auto;
             box-shadow: 0 0 60px rgba(255,255,255,0.3), inset -20px -20px 40px rgba(0,0,0,0.4);
+            transition: all 1.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            cursor: pointer;
         }
         .planet.active {
             opacity: 1;
-            transform: scale(1);
         }
         .planet:hover {
             transform: scale(1.1);
@@ -136,6 +135,10 @@
             left: 15%;
             top: 25%;
             background: radial-gradient(circle at 30% 30%, #f4a460, #cd853f 40%, #8b4513 100%);
+            transform: translate(-500px, -300px) scale(0);
+        }
+        .planet-asteroide.active {
+            transform: translate(0, 0) scale(1);
             animation: float1 6s ease-in-out infinite;
         }
         .planet-baobab {
@@ -144,6 +147,10 @@
             right: 20%;
             top: 30%;
             background: radial-gradient(circle at 35% 35%, #4a7c4e, #2d5a2e 50%, #1a3a1a 100%);
+            transform: translate(600px, -400px) scale(0);
+        }
+        .planet-baobab.active {
+            transform: translate(0, 0) scale(1);
             animation: float2 7s ease-in-out infinite;
         }
         .planet-pecora {
@@ -152,6 +159,10 @@
             left: 25%;
             bottom: 20%;
             background: radial-gradient(circle at 30% 30%, #e8e8e8, #c0c0c0 50%, #909090 100%);
+            transform: translate(-600px, 500px) scale(0);
+        }
+        .planet-pecora.active {
+            transform: translate(0, 0) scale(1);
             animation: float3 5s ease-in-out infinite;
         }
         .planet-lampione {
@@ -161,6 +172,10 @@
             bottom: 25%;
             background: radial-gradient(circle at 40% 40%, #fff8dc, #ffd700 50%, #daa520 100%);
             box-shadow: 0 0 80px rgba(255, 215, 0, 0.6), 0 0 120px rgba(255, 165, 0, 0.4), inset -15px -15px 30px rgba(0,0,0,0.3);
+            transform: translate(700px, 400px) scale(0);
+        }
+        .planet-lampione.active {
+            transform: translate(0, 0) scale(1);
             animation: float4 8s ease-in-out infinite;
         }
         .planet-label {
