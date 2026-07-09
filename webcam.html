@@ -65,7 +65,7 @@
             position: absolute;
             right: 40px;
         }
-        nav .nav-right a, nav .nav-right span {
+        nav .nav-right a {
             color: #e8d5b7;
             text-decoration: none;
             font-size: 0.95rem;
@@ -80,11 +80,16 @@
         }
         .admin-badge {
             background: #e74c3c;
-            color: white;
+            color: white !important;
             padding: 5px 12px;
             border-radius: 15px;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .admin-badge:hover {
+            background: #c0392b;
         }
         header {
             text-align: center;
