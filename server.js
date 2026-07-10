@@ -22,6 +22,7 @@ const ADMIN_USER = 'admin';
 const ADMIN_PASS = process.env.ADMIN_PASSWORD || 'admin123';
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(express.static(__dirname));
 
 app.use(session({
