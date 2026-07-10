@@ -165,7 +165,11 @@ app.get('/api/aviators', async (req, res) => {
 
 app.post('/api/sensors', async (req, res) => {
     try {
-        const { touch, proximity } = req.body;
+        let { touch, proximity } = req.body;
+        
+        if (touch === 1 || touch === '1') touch = true;
+        else if (touch === 0 || touch === '0') touch = false;
+        
         const result = await pool.query(
             'INSERT INTO sensor_data (touch, proximity) VALUES ($1, $2) RETURNING *',
             [touch, proximity]
