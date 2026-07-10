@@ -467,7 +467,7 @@
                     touchValue.className = 'sensor-value ' + (latest.touch ? 'active' : 'inactive');
                     touchStatus.textContent = latest.touch ? 'Toccato' : 'Non toccato';
                     
-                    proximityValue.textContent = latest.proximity + ' cm';
+                    proximityValue.textContent = latest.proximity + ' mm';
                     proximityValue.className = 'sensor-value ' + (latest.proximity < 10 ? 'active' : '');
                     
                     lastUpdate.textContent = new Date(latest.timestamp).toLocaleString('it-IT');
@@ -476,7 +476,7 @@
                         <tr>
                             <td>${new Date(row.timestamp).toLocaleString('it-IT')}</td>
                             <td><span class="status-badge ${row.touch ? 'on' : 'off'}">${row.touch ? 'Toccato' : 'Non toccato'}</span></td>
-                            <td>${row.proximity} cm</td>
+                            <td>${row.proximity} mm</td>
                         </tr>
                     `).join('');
                 } else {
